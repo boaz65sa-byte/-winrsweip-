@@ -1,0 +1,127 @@
+=====================================
+SWIPEBID — APP STORE LISTING
+=====================================
+
+--- APP NAME ---
+SwipeBid – Swipe & Bid
+
+--- SUBTITLE (30 chars max) ---
+Tinder-Style Auctions in Israel
+
+--- CATEGORY ---
+Primary: Shopping
+Secondary: Finance
+
+--- KEYWORDS (100 chars max) ---
+auction,bid,swipe,sell,buy,מכרז,מכרזים,קנה,מכור,eBay,marketplace,Israel
+
+===========================
+DESCRIPTION — ENGLISH
+===========================
+SwipeBid is the first Tinder-style auction app for Israel.
+Swipe through unique items, place bids, and win deals — all in seconds.
+
+🔥 HOW IT WORKS
+• Swipe right to save an item, left to skip
+• Tap the bid button to place your offer
+• Win the auction before the timer runs out
+• Pay securely with Stripe — money held in escrow until you confirm delivery
+
+🛡️ SAFE TRADE PROTECTION
+Every transaction is protected by our Escrow system.
+Your money is held securely and only released to the seller after you confirm receipt of the item.
+
+💰 SELL IN MINUTES
+• Take photos or upload from your gallery
+• Set a starting price, reserve price, and Buy It Now option
+• Your listing goes live immediately after admin approval
+
+🔔 NEVER MISS A BID
+Real-time push notifications when:
+• Someone outbids you
+• Your auction ends
+• You win an item
+
+📍 FIND LOCAL DEALS
+Filter auctions by location and find items near you.
+
+💬 BUILT-IN CHAT
+Coordinate shipping directly with the seller through our secure in-app chat — only available after a deal is closed.
+
+SwipeBid charges a 2% Safe Trade Fee per transaction for buyer protection, and a 10% platform fee for sellers.
+
+Terms of Use and Privacy Policy available in the app.
+
+===========================
+DESCRIPTION — HEBREW (עברית)
+===========================
+SwipeBid — מכרז בסגנון Tinder לישראל.
+סוויפ על פריטים ייחודיים, הגש הצעות וזכה בעסקאות — הכל בשניות.
+
+🔥 איך זה עובד
+• סוויפ ימינה לשמירת פריט, שמאלה לדילוג
+• לחץ על כפתור ההצעה לביצוע הצעת מחיר
+• זכה במכרז לפני פקיעת הטיימר
+• שלם בבטחה עם Stripe — הכסף מוחזק בנאמנות עד לאישורך
+
+🛡️ הגנת Safe Trade
+כל עסקה מוגנת במערכת Escrow שלנו.
+הכסף מוחזק בבטחה ומשוחרר למוכר רק לאחר שתאשר קבלת הפריט.
+
+💰 פרסם תוך דקות
+• צלם תמונות או העלה מהגלריה
+• קבע מחיר פתיחה, מחיר רזרבה ואפשרות "קנה עכשיו"
+• המודעה עולה לאוויר מיד לאחר אישור מנהל
+
+🔔 אל תפספס הצעה
+התראות Push בזמן אמת כאשר:
+• עקפו את הצעתך
+• המכרז שלך הסתיים
+• זכית בפריט
+
+📍 מצא עסקאות קרובות
+סנן מכרזים לפי מיקום ומצא פריטים בסביבתך.
+
+💬 צ'אט מובנה
+תאם משלוח עם המוכר ישירות דרך הצ'אט המאובטח — זמין רק לאחר סגירת עסקה.
+
+SwipeBid גובה 2% Safe Trade Fee לעסקה להגנת הקונה, ו-10% עמלת פלטפורמה מהמוכר.
+
+=====================================
+SCREENSHOTS — WHAT TO CAPTURE
+(iPhone 6.5" = iPhone 14 Pro Max)
+=====================================
+
+Screenshot 1: מסך הסוויפ הראשי עם כרטיס מוצר יפה
+Screenshot 2: מודל הגשת הצעה פתוח
+Screenshot 3: מסך חיפוש עם גריד מוצרים
+Screenshot 4: מסך פרטי מוצר (listing) עם Carousel
+Screenshot 5: מסך הרכישות שלי (won) עם Escrow badge
+Screenshot 6: מסך צ'אט עם הודעות
+
+Tip: צלם על iPhone אמיתי עם Dark Mode פעיל — נראה הכי טוב.
+
+=====================================
+PRIVACY POLICY URL
+=====================================
+https://bs-simple.com/swipebid/privacy
+(צריך להעלות את דף הפרייבסי לאתר לפני הגשה)
+
+=====================================
+SUPPORT URL
+=====================================
+https://bs-simple.com/swipebid
+
+=====================================
+MARKETING URL (optional)
+=====================================
+https://bs-simple.com/swipebid
+
+=====================================
+AGE RATING
+=====================================
+17+ (Unrestricted Web Access, Financial Info)
+
+=====================================
+bs-simple.com | בועז סעדה - פתרונות יצירתיים
+=====================================
