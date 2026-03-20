@@ -153,7 +153,15 @@ export default function RootLayout() {
         <Tabs.Screen name="seller" options={{ href: null, tabBarItemStyle: { display: 'none' } }} />
         <Tabs.Screen name="admin" options={{ href: null, tabBarItemStyle: { display: 'none' } }} />
         <Tabs.Screen name="users" options={{ href: null, tabBarItemStyle: { display: 'none' } }} />
-        <Tabs.Screen name="login" options={{ href: null, tabBarItemStyle: { display: 'none' } }} />
+        <Tabs.Screen name="payment" options={{ href: null, tabBarItemStyle: { display: 'none' } }} />
+        <Tabs.Screen
+          name="login"
+          options={{
+            href: null,
+            tabBarStyle: { display: 'none' },
+            tabBarItemStyle: { display: 'none' },
+          }}
+        />
       </Tabs>
       </ThemeContext.Provider>
       </StripeProvider>

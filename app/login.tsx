@@ -54,7 +54,9 @@ export default function LoginScreen() {
       Alert.alert('שגיאה', 'הכנס את המייל שלך קודם');
       return;
     }
-    const { error } = await supabase.auth.resetPasswordForEmail(email);
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: 'winrswipe://login',
+    });
     if (error) {
       Alert.alert('שגיאה', error.message);
     } else {
@@ -63,7 +65,12 @@ export default function LoginScreen() {
   };
 
   const handleGoogle = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({ provider: 'google' });
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: 'winrswipe://login',
+      },
+    });
     if (error) Alert.alert('שגיאה', error.message);
   };
 
@@ -72,8 +79,8 @@ export default function LoginScreen() {
       <StatusBar style="light" />
 
       <View style={s.top}>
-        <Text style={s.logo}>Swipe<Text style={s.logoAccent}>Bid</Text></Text>
-        <Text style={s.tagline}>קנה. מכור. זכה.</Text>
+        <Text style={s.logo}>Winr<Text style={s.logoAccent}>Swipe</Text></Text>
+        <Text style={s.tagline}>סוויפ. הצע. נצח.</Text>
       </View>
 
       <View style={s.card}>
