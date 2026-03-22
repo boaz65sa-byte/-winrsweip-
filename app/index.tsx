@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useContext, useEffect, useState } from 'react';
@@ -210,10 +211,10 @@ export default function App() {
         <Text style={[s.logo, { color: theme.text }]}>Winr<Text style={s.logoAccent}>Swipe</Text></Text>
         <View style={{ flexDirection: 'row', gap: 8 }}>
           <TouchableOpacity onPress={theme.toggle} style={[s.iconBtn, { backgroundColor: theme.card, borderColor: theme.border }]}>
-            <Text style={{ fontSize: 16 }}>{theme.dark ? '☀️' : '🌙'}</Text>
+            <Ionicons name={theme.dark ? 'sunny' : 'moon'} size={18} color={theme.text} />
           </TouchableOpacity>
           <TouchableOpacity onPress={() => { setLoading(true); loadListings(); }} style={[s.iconBtn, { backgroundColor: theme.card, borderColor: theme.border }]}>
-            <Text style={{ color: theme.sub, fontSize: 18 }}>↻</Text>
+            <Ionicons name="refresh" size={18} color={theme.sub} />
           </TouchableOpacity>
         </View>
       </View>
@@ -255,13 +256,13 @@ export default function App() {
 
       <View style={s.actions}>
         <TouchableOpacity style={[s.btnPass, { backgroundColor: theme.card, borderColor: theme.border }]} onPress={() => { translateX.value = withSpring(-width * 1.5, {}, () => runOnJS(nextCard)()); }}>
-          <Text style={[s.btnPassText, { color: theme.sub }]}>✕</Text>
+          <Ionicons name="close" size={26} color={theme.sub} />
         </TouchableOpacity>
         <TouchableOpacity style={s.btnBid} onPress={() => { setBidAmount(String((product.current_bid || product.starting_price) + 10)); setShowBid(true); }}>
-          <Text style={s.btnBidText}>⬆</Text>
+          <Ionicons name="arrow-up" size={32} color="#fff" />
         </TouchableOpacity>
         <TouchableOpacity style={[s.btnWatch, { backgroundColor: theme.card, borderColor: theme.border }]} onPress={() => { translateX.value = withSpring(width * 1.5, {}, () => runOnJS(nextCard)()); }}>
-          <Text style={[s.btnWatchText, { color: theme.sub }]}>♥</Text>
+          <Ionicons name="heart" size={24} color="#FF4D1C" />
         </TouchableOpacity>
       </View>
 
@@ -323,12 +324,9 @@ const s = StyleSheet.create({
   buyNowText: { color: '#fff', fontSize: 12, fontWeight: '700' },
   bidsCount: { fontSize: 12, marginTop: 8 },
   actions: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 16, paddingVertical: 20 },
-  btnPass: { width: 54, height: 54, borderRadius: 27, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
-  btnPassText: { fontSize: 20, fontWeight: '700' },
-  btnBid: { width: 70, height: 70, borderRadius: 35, backgroundColor: '#FF4D1C', alignItems: 'center', justifyContent: 'center' },
-  btnBidText: { color: '#fff', fontSize: 28, fontWeight: '700' },
-  btnWatch: { width: 54, height: 54, borderRadius: 27, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
-  btnWatchText: { fontSize: 20 },
+  btnPass: { width: 58, height: 58, borderRadius: 29, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
+  btnBid: { width: 74, height: 74, borderRadius: 37, backgroundColor: '#FF4D1C', alignItems: 'center', justifyContent: 'center', shadowColor: '#FF4D1C', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.4, shadowRadius: 12, elevation: 8 },
+  btnWatch: { width: 58, height: 58, borderRadius: 29, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
   hint: { textAlign: 'center', fontSize: 11, marginTop: 4 },
   modalOverlay: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, justifyContent: 'flex-end' },
   modalBg: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.85)' },
