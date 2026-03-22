@@ -80,6 +80,7 @@ export default function PaymentScreen() {
         safe_trade_fee: safeTradeFee,
         platform_fee: Math.round(amount * 0.10),
         status: 'holding',
+        paid: true,
       }, { onConflict: 'listing_id' });
 
       Alert.alert('תשלום הצליח! 🎉', 'הכסף מוחזק בנאמנות עד קבלת הפריט.');

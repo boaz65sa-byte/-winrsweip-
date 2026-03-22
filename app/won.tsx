@@ -202,7 +202,23 @@ export default function WonScreen() {
               </View>
             )}
 
-            {item.status === 'holding' && (
+            {item.status === 'holding' && !item.paid && (
+              <TouchableOpacity
+                style={s.payBtn}
+                onPress={() => router.push({
+                  pathname: '/payment',
+                  params: {
+                    listingId: item.listing_id,
+                    amount: item.amount,
+                    title: item.listings?.title || 'פריט',
+                  },
+                })}
+              >
+                <Text style={s.payBtnText}>שלם עכשיו ₪{item.amount + (item.safe_trade_fee || Math.round(item.amount * 0.02))} ←</Text>
+              </TouchableOpacity>
+            )}
+
+            {item.status === 'holding' && item.paid && (
               <View style={[s.waitBox, { backgroundColor: theme.input }]}>
                 <Text style={[s.waitText, { color: theme.sub }]}>⏳ ממתין לשילוח מהמוכר</Text>
               </View>
@@ -279,6 +295,8 @@ const s = StyleSheet.create({
   chatBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, borderRadius: 14, padding: 12, borderWidth: 1, marginTop: 8 },
   chatBtnIcon: { fontSize: 16 },
   chatBtnText: { fontSize: 14, fontWeight: '600' },
+  payBtn: { backgroundColor: '#FF4D1C', borderRadius: 14, padding: 16, alignItems: 'center', marginTop: 4 },
+  payBtnText: { color: '#fff', fontWeight: '900', fontSize: 15 },
 });
 
 // bs-simple.com | בועז סעדה - פתרונות יצירתיים
