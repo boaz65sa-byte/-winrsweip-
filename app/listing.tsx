@@ -60,14 +60,14 @@ export default function ListingScreen() {
 
       const { data: b } = await supabase
         .from('bids')
-        .select('*, profiles(full_name)')
+        .select('*, users(full_name)')
         .eq('listing_id', id)
         .order('amount', { ascending: false })
         .limit(10);
       if (b) setBids(b);
 
       if (l.seller_id) {
-        const { data: s } = await supabase.from('profiles').select('*').eq('id', l.seller_id).single();
+        const { data: s } = await supabase.from('users').select('*').eq('id', l.seller_id).single();
         if (s) setSeller(s);
       }
     } catch (e) {
@@ -78,6 +78,14 @@ export default function ListingScreen() {
   };
 
   const submitBid = async () => {
+    if (listing.status !== 'active') {
+      Alert.alert('אוקציה הסתיימה', 'לא ניתן להגיש הצעות על אוקציה שנסגרה.');
+      return;
+    }
+    if (listing.ends_at && new Date(listing.ends_at) < new Date()) {
+      Alert.alert('אוקציה הסתיימה', 'זמן האוקציה פג.');
+      return;
+    }
     const amount = Number(bidAmount);
     const minBid = (listing.current_bid || listing.starting_price) + 1;
     if (!bidAmount || amount < minBid) {
@@ -88,6 +96,10 @@ export default function ListingScreen() {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { Alert.alert('שגיאה', 'התחבר קודם'); return; }
+      if (user.id === listing.seller_id) {
+        Alert.alert('שגיאה', 'לא ניתן להגיש הצעה על המוצר שלך');
+        return;
+      }
 
       // שלוף הבידר הקודם לפני העדכון
       const { data: prevBid } = await supabase
@@ -101,8 +113,8 @@ export default function ListingScreen() {
       const safeTradeFee = Math.round(amount * 0.02);
       const platformFee = Math.round(amount * 0.10);
 
-      await supabase.from('bids').insert({ listing_id: id, bidder_id: user.id, amount });
-      await supabase.from('listings').update({ current_bid: amount }).eq('id', id);
+      const { error: bidError } = await supabase.from('bids').insert({ listing_id: id, bidder_id: user.id, amount });
+      if (bidError) throw new Error(bidError.message);
 
       // התראה לבידר הקודם
       if (prevBid?.bidder_id && prevBid.bidder_id !== user.id) {
@@ -123,16 +135,6 @@ export default function ListingScreen() {
           { screen: '/profile' }
         );
       }
-      await supabase.from('escrow_transactions').upsert({
-        listing_id: id,
-        buyer_id: user.id,
-        seller_id: listing.seller_id,
-        amount,
-        safe_trade_fee: safeTradeFee,
-        platform_fee: platformFee,
-        status: 'holding',
-      }, { onConflict: 'listing_id' });
-
       const isMatch = listing.reserve_price && amount >= listing.reserve_price;
       if (isMatch) {
         await supabase.from('listings').update({
@@ -308,7 +310,7 @@ export default function ListingScreen() {
                 <View key={bid.id} style={[s.bidRow, i < bids.length - 1 && { borderBottomWidth: 1, borderBottomColor: theme.border }]}>
                   <Text style={{ fontSize: 14 }}>{i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '  '}</Text>
                   <Text style={[s.bidName, { color: theme.sub }]}>
-                    {bid.profiles?.full_name || 'משתמש אנונימי'}
+                    {bid.users?.full_name || 'משתמש אנונימי'}
                   </Text>
                   <Text style={s.bidVal}>₪{bid.amount}</Text>
                 </View>
