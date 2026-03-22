@@ -166,12 +166,17 @@ ALTER TABLE public.escrow_transactions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.messages            ENABLE ROW LEVEL SECURITY;
 
 -- USERS policies
+DROP POLICY IF EXISTS "users_read_own"        ON public.users;
+DROP POLICY IF EXISTS "users_update_own"      ON public.users;
+DROP POLICY IF EXISTS "users_insert_trigger"  ON public.users;
 CREATE POLICY "users_read_own"   ON public.users FOR SELECT USING (auth.uid() = id);
 CREATE POLICY "users_update_own" ON public.users FOR UPDATE USING (auth.uid() = id);
--- Allow insert only via trigger (SECURITY DEFINER function)
 CREATE POLICY "users_insert_trigger" ON public.users FOR INSERT WITH CHECK (auth.uid() = id);
 
 -- LISTINGS policies
+DROP POLICY IF EXISTS "listings_read_active"  ON public.listings;
+DROP POLICY IF EXISTS "listings_insert_own"   ON public.listings;
+DROP POLICY IF EXISTS "listings_update_own"   ON public.listings;
 CREATE POLICY "listings_read_active"
   ON public.listings FOR SELECT
   USING (status = 'active' OR seller_id = auth.uid());
@@ -185,6 +190,8 @@ CREATE POLICY "listings_update_own"
   USING (seller_id = auth.uid());
 
 -- BIDS policies
+DROP POLICY IF EXISTS "bids_read_involved"  ON public.bids;
+DROP POLICY IF EXISTS "bids_insert_auth"    ON public.bids;
 CREATE POLICY "bids_read_involved"
   ON public.bids FOR SELECT
   USING (
@@ -197,6 +204,9 @@ CREATE POLICY "bids_insert_auth"
   WITH CHECK (bidder_id = auth.uid());
 
 -- ESCROW TRANSACTIONS policies
+DROP POLICY IF EXISTS "escrow_read_involved"  ON public.escrow_transactions;
+DROP POLICY IF EXISTS "escrow_insert_buyer"   ON public.escrow_transactions;
+DROP POLICY IF EXISTS "escrow_update_buyer"   ON public.escrow_transactions;
 CREATE POLICY "escrow_read_involved"
   ON public.escrow_transactions FOR SELECT
   USING (buyer_id = auth.uid() OR seller_id = auth.uid());
@@ -210,6 +220,9 @@ CREATE POLICY "escrow_update_buyer"
   USING (buyer_id = auth.uid() OR seller_id = auth.uid());
 
 -- MESSAGES policies
+DROP POLICY IF EXISTS "messages_read_involved"  ON public.messages;
+DROP POLICY IF EXISTS "messages_insert_sender"  ON public.messages;
+DROP POLICY IF EXISTS "messages_update_read"    ON public.messages;
 CREATE POLICY "messages_read_involved"
   ON public.messages FOR SELECT
   USING (sender_id = auth.uid() OR receiver_id = auth.uid());
