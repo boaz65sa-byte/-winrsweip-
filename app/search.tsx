@@ -17,7 +17,7 @@ export default function SearchScreen() {
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [locationMode, setLocationMode] = useState<'all' | 'near'>('all');
-  const [userLocation, setUserLocation] = useState<any>(null);
+  const [userCity, setUserCity] = useState<string | null>(null);
   const [locationLoading, setLocationLoading] = useState(false);
 
   useEffect(() => { loadListings(); }, [selectedCategory]);
@@ -26,12 +26,10 @@ export default function SearchScreen() {
     setLocationLoading(true);
     try {
       const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        alert('נא לאפשר גישה למיקום בהגדרות');
-        return;
-      }
+      if (status !== 'granted') { alert('נא לאפשר גישה למיקום בהגדרות'); return; }
       const loc = await Location.getCurrentPositionAsync({});
-      setUserLocation(loc.coords);
+      const [address] = await Location.reverseGeocodeAsync(loc.coords);
+      if (address?.city) setUserCity(address.city);
       setLocationMode('near');
     } catch (e) {
       alert('לא הצלחנו לקבל מיקום');
@@ -63,23 +61,12 @@ export default function SearchScreen() {
     }
   };
 
-  const getDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
-    const R = 6371;
-    const dLat = (lat2 - lat1) * Math.PI / 180;
-    const dLon = (lon2 - lon1) * Math.PI / 180;
-    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-      Math.sin(dLon/2) * Math.sin(dLon/2);
-    return Math.round(R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
-  };
-
-  const filtered = listings.filter(item => {
+const filtered = listings.filter(item => {
     const matchQuery = !query ||
       item.title?.toLowerCase().includes(query.toLowerCase()) ||
       item.category?.toLowerCase().includes(query.toLowerCase());
 
-    const matchLocation = locationMode === 'all' || !userLocation || !item.latitude ||
-      getDistance(userLocation.latitude, userLocation.longitude, item.latitude, item.longitude) <= 50;
+    const matchLocation = locationMode === 'all' || !userCity || item.city === userCity;
 
     return matchQuery && matchLocation;
   });
@@ -119,13 +106,13 @@ export default function SearchScreen() {
         </TouchableOpacity>
         <TouchableOpacity
           style={[s.locationBtn, { backgroundColor: theme.card, borderColor: theme.border }, locationMode === 'near' && s.locationBtnActive]}
-          onPress={userLocation ? () => setLocationMode('near') : getLocation}
+          onPress={userCity ? () => setLocationMode('near') : getLocation}
           disabled={locationLoading}
         >
           {locationLoading
             ? <ActivityIndicator color="#FF4D1C" size="small" />
             : <Text style={[s.locationBtnText, { color: theme.sub }, locationMode === 'near' && s.locationBtnTextActive]}>
-                📍 קרוב אליי
+                📍 {userCity && locationMode === 'near' ? userCity : 'קרוב אליי'}
               </Text>
           }
         </TouchableOpacity>
@@ -187,12 +174,7 @@ export default function SearchScreen() {
                       <Text style={[s.gridMeta, { color: theme.sub }]}>{item.category}</Text>
                       <Text style={s.gridPrice}>₪{item.current_bid || item.starting_price}</Text>
                       {item.city && (
-                        <Text style={[s.gridCity, { color: theme.sub }]}>
-                          📍 {item.city}
-                          {locationMode === 'near' && userLocation && item.latitude
-                            ? ` · ${getDistance(userLocation.latitude, userLocation.longitude, item.latitude, item.longitude)} ק"מ`
-                            : ''}
-                        </Text>
+                        <Text style={[s.gridCity, { color: theme.sub }]}>📍 {item.city}</Text>
                       )}
                     </View>
                   </TouchableOpacity>

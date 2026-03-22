@@ -5,6 +5,7 @@ import { useContext, useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, Dimensions, Image, KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { Gesture, GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
 import Animated, { runOnJS, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
+import * as Location from 'expo-location';
 import { notifyUser } from '../lib/notifications';
 import { supabase } from '../lib/supabase';
 import { ThemeContext } from './_layout';
@@ -25,10 +26,13 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [bidLoading, setBidLoading] = useState(false);
   const [timeLeft, setTimeLeft] = useState<{[key: string]: string}>({});
+  const [cityFilter, setCityFilter] = useState<string | null>(null); // null = כל הארץ
+  const [userCity, setUserCity] = useState<string | null>(null);
   const translateX = useSharedValue(0);
   const translateY = useSharedValue(0);
 
-  useEffect(() => { loadListings(); }, []);
+  useEffect(() => { detectCity(); }, []);
+  useEffect(() => { loadListings(); }, [cityFilter]);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -49,16 +53,36 @@ export default function App() {
     return () => clearInterval(timer);
   }, [products]);
 
+  const detectCity = async () => {
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') return;
+      const loc = await Location.getCurrentPositionAsync({});
+      const [address] = await Location.reverseGeocodeAsync(loc.coords);
+      if (address?.city) {
+        setUserCity(address.city);
+        setCityFilter(address.city);
+      }
+    } catch (e) {
+      // no location — show all
+    }
+  };
+
   const loadListings = async () => {
     try {
-      const { data } = await supabase
+      let q = supabase
         .from('listings')
         .select('*')
         .eq('status', 'active')
         .order('created_at', { ascending: false });
+
+      if (cityFilter) q = q.eq('city', cityFilter);
+
+      const { data } = await q;
       if (data && data.length > 0) {
         setProducts(data.map(item => ({ ...item, emoji: '🛍️', bids: 0, watchers: 0 })));
-        setIndex(0);
+      } else {
+        setProducts([]);
       }
     } catch (e) {
       console.log('fallback');
@@ -233,6 +257,24 @@ export default function App() {
             <Ionicons name="refresh" size={18} color={theme.sub} />
           </TouchableOpacity>
         </View>
+      </View>
+
+      {/* City filter bar */}
+      <View style={{ flexDirection: 'row', gap: 8, paddingHorizontal: 16, marginBottom: 10 }}>
+        <TouchableOpacity
+          style={[s.iconBtn, { backgroundColor: cityFilter === null ? '#FF4D1C' : theme.card, borderColor: cityFilter === null ? '#FF4D1C' : theme.border, flex: 1, borderRadius: 20, height: 36 }]}
+          onPress={() => { setCityFilter(null); setLoading(true); }}
+        >
+          <Text style={{ color: cityFilter === null ? '#fff' : theme.sub, fontSize: 12, fontWeight: '700' }}>🌍 כל הארץ</Text>
+        </TouchableOpacity>
+        {userCity && (
+          <TouchableOpacity
+            style={[s.iconBtn, { backgroundColor: cityFilter === userCity ? '#FF4D1C' : theme.card, borderColor: cityFilter === userCity ? '#FF4D1C' : theme.border, flex: 1, borderRadius: 20, height: 36 }]}
+            onPress={() => { setCityFilter(userCity); setLoading(true); }}
+          >
+            <Text style={{ color: cityFilter === userCity ? '#fff' : theme.sub, fontSize: 12, fontWeight: '700' }}>📍 {userCity}</Text>
+          </TouchableOpacity>
+        )}
       </View>
 
       <GestureDetector gesture={gesture}>

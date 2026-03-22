@@ -1,3 +1,4 @@
+import * as WebBrowser from 'expo-web-browser';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
@@ -65,13 +66,26 @@ export default function LoginScreen() {
   };
 
   const handleGoogle = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
+    const redirectUrl = 'winrswipe://login';
+    const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: 'winrswipe://login',
+        redirectTo: redirectUrl,
+        skipBrowserRedirect: true,
       },
     });
-    if (error) Alert.alert('שגיאה', error.message);
+    if (error || !data.url) { Alert.alert('שגיאה', error?.message ?? 'שגיאה'); return; }
+
+    const result = await WebBrowser.openAuthSessionAsync(data.url, redirectUrl);
+    if (result.type === 'success') {
+      const hashParams = new URLSearchParams(result.url.split('#')[1] ?? '');
+      const accessToken = hashParams.get('access_token');
+      const refreshToken = hashParams.get('refresh_token');
+      if (accessToken && refreshToken) {
+        const { error: sessionError } = await supabase.auth.setSession({ access_token: accessToken, refresh_token: refreshToken });
+        if (!sessionError) router.replace('/');
+      }
+    }
   };
 
   return (

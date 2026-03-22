@@ -1,3 +1,4 @@
+import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useContext, useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, RefreshControl, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
@@ -6,6 +7,11 @@ import { ThemeContext } from './_layout';
 
 export default function UsersScreen() {
   const theme = useContext(ThemeContext);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (theme.user !== null && !theme.isAdmin) router.replace('/');
+  }, [theme.isAdmin, theme.user]);
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
