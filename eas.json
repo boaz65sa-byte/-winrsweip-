@@ -29,7 +29,7 @@
         "resourceClass": "m-medium"
       },
       "env": {
-        "EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY": "your_stripe_live_key_here"
+        "EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY": "pk_test_51TDtnV1Ctpbq110omt8d5UcoIrSG16xGbmz4Hpc2y1XiYMGrZIVrHrexVjOVnA469qMLW3pLXj1sEhMCAiO3NPra00JxZZDa8S"
       }
     }
   },
