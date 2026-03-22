@@ -39,8 +39,12 @@ Deno.serve(async (req) => {
     const data = await response.json();
 
     if (!response.ok) {
-      console.error('Stripe error:', JSON.stringify(data));
-      throw new Error(data.error?.message || `Stripe error: ${response.status}`);
+      const errMsg = `Stripe ${response.status}: ${data.error?.message || JSON.stringify(data)}`;
+      console.error('Stripe error:', errMsg);
+      return new Response(
+        JSON.stringify({ error: errMsg }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
+      );
     }
 
     if (!data.client_secret) {

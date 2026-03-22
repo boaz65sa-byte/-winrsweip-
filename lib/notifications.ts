@@ -61,12 +61,8 @@ export async function notifyUser(
   data?: Record<string, any>
 ) {
   try {
-    const { data: sessionData } = await supabase.auth.getSession();
     await supabase.functions.invoke('send-notification', {
       body: { user_id: userId, title, body, data: data || {} },
-      headers: {
-        Authorization: `Bearer ${sessionData.session?.access_token}`,
-      },
     });
   } catch (e) {
     console.log('notifyUser error:', e);

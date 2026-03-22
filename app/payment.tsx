@@ -25,8 +25,6 @@ export default function PaymentScreen() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { Alert.alert('שגיאה', 'התחבר קודם'); return; }
 
-      const { data: sessionData } = await supabase.auth.getSession();
-
       const { data, error } = await supabase.functions.invoke('create-payment-intent', {
         body: {
           amount: total * 100,
@@ -34,14 +32,11 @@ export default function PaymentScreen() {
           listingId,
           userId: user.id,
         },
-        headers: {
-          Authorization: `Bearer ${sessionData.session?.access_token}`,
-        },
       });
 
-      if (error) {
-        const errMsg = (data as any)?.error || error.message;
-        throw new Error(errMsg);
+      if (error || data?.error) {
+        const errMsg = data?.error || error?.message || 'שגיאה לא ידועה';
+        throw new Error(`[${errMsg}] data=${JSON.stringify(data)}`);
       }
       if (!data?.clientSecret) {
         throw new Error((data as any)?.error || 'לא התקבל clientSecret מהשרת');
