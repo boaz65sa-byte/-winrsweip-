@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { supabase } from '../lib/supabase';
 
 const NAV = [
   { href: '/', icon: '📊', label: 'דשבורד' },
@@ -12,6 +13,13 @@ const NAV = [
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    router.push('/login');
+    router.refresh();
+  };
 
   return (
     <aside style={{
@@ -60,9 +68,27 @@ export default function Sidebar() {
         })}
       </nav>
 
-      {/* Footer */}
-      <div style={{ padding: '16px 20px', borderTop: '1px solid #1E1E1E' }}>
-        <div style={{ fontSize: 11, color: '#333' }}>bs-simple.com</div>
+      {/* Logout */}
+      <div style={{ padding: '12px 20px', borderTop: '1px solid #1E1E1E' }}>
+        <button
+          onClick={handleLogout}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            width: '100%',
+            background: 'none',
+            border: 'none',
+            color: '#555',
+            fontSize: 13,
+            cursor: 'pointer',
+            padding: '8px 0',
+          }}
+        >
+          <span>🚪</span>
+          יציאה
+        </button>
+        <div style={{ fontSize: 11, color: '#333', marginTop: 8 }}>bs-simple.com</div>
         <div style={{ fontSize: 11, color: '#222', marginTop: 2 }}>בועז סעדה</div>
       </div>
     </aside>
