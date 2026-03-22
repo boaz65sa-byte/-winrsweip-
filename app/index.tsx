@@ -20,7 +20,6 @@ export default function App() {
   const theme = useContext(ThemeContext);
   const router = useRouter();
   const [products, setProducts] = useState<any[]>(FALLBACK);
-  const [index, setIndex] = useState(0);
   const [showBid, setShowBid] = useState(false);
   const [bidAmount, setBidAmount] = useState('');
   const [loading, setLoading] = useState(true);
@@ -91,7 +90,7 @@ export default function App() {
 
   const submitBid = async () => {
     const amount = Number(bidAmount);
-    const product = products[index % products.length];
+    const product = products[0];
     const minBid = (product.current_bid || product.starting_price) + 1;
 
     if (!bidAmount || amount < minBid) {
@@ -170,10 +169,10 @@ export default function App() {
     }
   };
 
-  const product = products[index % products.length];
+  const product = products[0];
 
   const nextCard = () => {
-    setIndex(i => i + 1);
+    setProducts(prev => prev.slice(1));
     translateX.value = 0;
     translateY.value = 0;
   };
@@ -199,6 +198,23 @@ export default function App() {
       <View style={[s.root, { backgroundColor: theme.bg, alignItems: 'center', justifyContent: 'center' }]}>
         <ActivityIndicator color="#FF4D1C" size="large" />
         <Text style={{ color: theme.sub, marginTop: 12, fontSize: 13 }}>טוען מכרזים...</Text>
+      </View>
+    );
+  }
+
+  if (products.length === 0) {
+    return (
+      <View style={[s.root, { backgroundColor: theme.bg, alignItems: 'center', justifyContent: 'center', gap: 16 }]}>
+        <StatusBar style={theme.dark ? 'light' : 'dark'} />
+        <Text style={{ fontSize: 64 }}>🎉</Text>
+        <Text style={{ color: theme.text, fontSize: 20, fontWeight: '900' }}>ראית הכל!</Text>
+        <Text style={{ color: theme.sub, fontSize: 14 }}>אין עוד מכרזים כרגע</Text>
+        <TouchableOpacity
+          style={{ marginTop: 8, backgroundColor: '#FF4D1C', borderRadius: 16, paddingHorizontal: 28, paddingVertical: 14 }}
+          onPress={() => { setLoading(true); loadListings(); }}
+        >
+          <Text style={{ color: '#fff', fontWeight: '800', fontSize: 15 }}>רענן</Text>
+        </TouchableOpacity>
       </View>
     );
   }
