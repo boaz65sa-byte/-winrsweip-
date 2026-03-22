@@ -101,6 +101,7 @@
       }
     },
     "owner": "boaz65sa",
-    "description": "Tinder-style auctions — swipe right, bid, and win unique items with built-in escrow."
+    "description": "WinrSwipe — Tinder-style auctions. Swipe right to bid, win unique items, and sell with built-in secure escrow. Buy and sell locally in Israel.",
+    "privacyPolicyUrl": "https://winrsweip-boaz-s-projects-6bda35e8.vercel.app/privacy"
   }
 }
