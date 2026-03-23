@@ -1,3 +1,4 @@
+import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useContext, useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -6,6 +7,7 @@ import { ThemeContext } from './_layout';
 
 export default function SellerScreen() {
   const theme = useContext(ThemeContext);
+  const router = useRouter();
   const [myListings, setMyListings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -84,6 +86,24 @@ export default function SellerScreen() {
     );
   };
 
+  const deleteListing = async (listing: any) => {
+    Alert.alert(
+      'מחיקת פרסום',
+      `למחוק את "${listing.title}"?`,
+      [
+        { text: 'ביטול', style: 'cancel' },
+        {
+          text: 'מחק',
+          style: 'destructive',
+          onPress: async () => {
+            await supabase.from('listings').delete().eq('id', listing.id);
+            loadMyListings();
+          }
+        }
+      ]
+    );
+  };
+
   const renewListing = async (listing: any) => {
     Alert.alert(
       'חידוש פרסום',
@@ -130,6 +150,7 @@ export default function SellerScreen() {
   };
 
   const matches = myListings.filter(l => l.match_status === 'pending_seller');
+  const pending = myListings.filter(l => l.status === 'pending');
   const active = myListings.filter(l => l.status === 'active' && !l.match_status);
   const ended = myListings.filter(l => l.status === 'sold' || l.status === 'rejected');
 
@@ -173,6 +194,43 @@ export default function SellerScreen() {
                   </TouchableOpacity>
                   <TouchableOpacity style={[s.rejectBtn, { borderColor: theme.border }]} onPress={() => rejectMatch(item)}>
                     <Text style={[s.rejectBtnText, { color: theme.sub }]}>דחה — המשך מכרז</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            ))}
+          </View>
+        )}
+
+        {/* פרסומים ממתינים לאישור */}
+        {pending.length > 0 && (
+          <View style={s.section}>
+            <View style={s.sectionHeader}>
+              <Text style={[s.sectionTitle, { color: theme.text }]}>⏳ ממתינים לאישור מנהל</Text>
+              <View style={[s.badge, { backgroundColor: '#FFB347' }]}><Text style={s.badgeText}>{pending.length}</Text></View>
+            </View>
+            {pending.map(item => (
+              <View key={item.id} style={[s.card, { backgroundColor: theme.card, borderColor: '#FFB347' }]}>
+                <View style={s.cardTop}>
+                  <Text style={[s.cardTitle2, { color: theme.text }]} numberOfLines={1}>{item.title}</Text>
+                  <View style={[s.statusBadge, { backgroundColor: '#FFB34722' }]}>
+                    <Text style={[s.statusText, { color: '#FFB347' }]}>⏳ ממתין</Text>
+                  </View>
+                </View>
+                <Text style={[s.cardMeta, { color: theme.sub, marginBottom: 10 }]}>
+                  מחיר: <Text style={{ color: '#FF4D1C', fontWeight: '700' }}>₪{item.starting_price}</Text>
+                </Text>
+                <View style={{ flexDirection: 'row', gap: 8 }}>
+                  <TouchableOpacity
+                    style={[s.editBtn, { borderColor: theme.border }]}
+                    onPress={() => router.push({ pathname: '/sell', params: { listingId: item.id } })}
+                  >
+                    <Text style={[s.editBtnText, { color: theme.text }]}>✏️ ערוך</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={s.deleteBtn}
+                    onPress={() => deleteListing(item)}
+                  >
+                    <Text style={s.deleteBtnText}>🗑 מחק</Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -280,4 +338,10 @@ const s = StyleSheet.create({
   emptyIcon: { fontSize: 40, marginBottom: 12 },
   emptyTitle: { fontSize: 16, fontWeight: '700', marginBottom: 6 },
   emptySub: { fontSize: 13 },
+  editBtn: { flex: 1, borderRadius: 10, padding: 10, alignItems: 'center', borderWidth: 1 },
+  editBtnText: { fontSize: 13, fontWeight: '600' },
+  deleteBtn: { backgroundColor: '#FF4D1C22', borderRadius: 10, padding: 10, alignItems: 'center', paddingHorizontal: 16 },
+  deleteBtnText: { color: '#FF4D1C', fontSize: 13, fontWeight: '600' },
 });
+
+// bs-simple.com | בועז סעדה - פתרונות יצירתיים

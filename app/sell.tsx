@@ -2,8 +2,9 @@ import { ResizeMode, Video } from 'expo-av';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
 import * as Location from 'expo-location';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useContext, useRef, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Alert, Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { supabase } from '../lib/supabase';
 import { ThemeContext } from './_layout';
@@ -14,6 +15,10 @@ const CITIES = ['תל אביב', 'ירושלים', 'חיפה', 'ראשון לצ�
 
 export default function SellScreen() {
   const theme = useContext(ThemeContext);
+  const router = useRouter();
+  const { listingId } = useLocalSearchParams<{ listingId?: string }>();
+  const isEdit = !!listingId;
+
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState('');
   const [condition, setCondition] = useState('');
@@ -34,6 +39,26 @@ export default function SellScreen() {
   const [showCamera, setShowCamera] = useState(false);
   const [permission, requestPermission] = useCameraPermissions();
   const cameraRef = useRef<any>(null);
+
+  useEffect(() => {
+    if (isEdit && listingId) loadListing(listingId);
+  }, [listingId]);
+
+  const loadListing = async (id: string) => {
+    const { data } = await supabase.from('listings').select('*').eq('id', id).single();
+    if (!data) return;
+    setTitle(data.title || '');
+    setCategory(data.category || '');
+    setCondition(data.condition || '');
+    setCity(data.city || '');
+    setStartingPrice(String(data.starting_price || ''));
+    setReservePrice(data.reserve_price ? String(data.reserve_price) : '');
+    setBuyNowPrice(data.buy_now_price ? String(data.buy_now_price) : '');
+    setDuration(data.duration_hours || 24);
+    setListingType(data.listing_type || 'both');
+    setImages(data.images || []);
+    setVideoUri(data.video_url || null);
+  };
 
   const pickImage = async () => {
     Alert.alert('הוסף תמונה', 'בחר מקור', [
@@ -102,6 +127,7 @@ export default function SellScreen() {
       },
     ]);
   };
+
   const uploadImage = async (uri: string) => {
     if (images.length >= 3) { Alert.alert('מקסימום 3 תמונות'); return; }
     setUploading(true);
@@ -166,8 +192,7 @@ export default function SellScreen() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { Alert.alert('שגיאה', 'התחבר קודם'); return; }
 
-      const { error } = await supabase.from('listings').insert({
-        seller_id: user.id,
+      const payload = {
         title,
         category,
         condition,
@@ -182,13 +207,22 @@ export default function SellScreen() {
         ends_at: new Date(Date.now() + duration * 3600000).toISOString(),
         images,
         video_url: videoUri,
-      });
+      };
 
-      if (error) throw error;
-      Alert.alert('נשלח לאישור! ✓', 'הפריט ממתין לאישור מנהל');
-      setTitle(''); setCategory(''); setCondition(''); setCity('');
-      setStartingPrice(''); setReservePrice(''); setBuyNowPrice('');
-      setImages([]); setVideoUri(null); setListingType('both');
+      if (isEdit && listingId) {
+        const { error } = await supabase.from('listings').update(payload).eq('id', listingId);
+        if (error) throw error;
+        Alert.alert('עודכן! ✓', 'הפרסום נשלח מחדש לאישור מנהל', [
+          { text: 'אישור', onPress: () => router.back() }
+        ]);
+      } else {
+        const { error } = await supabase.from('listings').insert({ ...payload, seller_id: user.id });
+        if (error) throw error;
+        Alert.alert('נשלח לאישור! ✓', 'הפריט ממתין לאישור מנהל');
+        setTitle(''); setCategory(''); setCondition(''); setCity('');
+        setStartingPrice(''); setReservePrice(''); setBuyNowPrice('');
+        setImages([]); setVideoUri(null); setListingType('both');
+      }
     } catch (e: any) {
       Alert.alert('שגיאה', e.message);
     } finally {
@@ -217,7 +251,12 @@ export default function SellScreen() {
     <View style={[s.root, { backgroundColor: theme.bg }]}>
       <StatusBar style={theme.dark ? 'light' : 'dark'} />
       <View style={s.header}>
-        <Text style={[s.title, { color: theme.text }]}>פרסם פריט</Text>
+        {isEdit && (
+          <TouchableOpacity onPress={() => router.back()} style={s.backBtn}>
+            <Text style={{ color: theme.text, fontSize: 16 }}>←</Text>
+          </TouchableOpacity>
+        )}
+        <Text style={[s.title, { color: theme.text }]}>{isEdit ? 'עריכת פרסום' : 'פרסם פריט'}</Text>
         <Text style={[s.sub, { color: theme.sub }]}>הכסף מאובטח עד אישור קבלה</Text>
       </View>
 
@@ -379,7 +418,7 @@ export default function SellScreen() {
         </View>
 
         <TouchableOpacity style={[s.publishBtn, loading && s.publishBtnDisabled]} onPress={publish} disabled={loading}>
-          {loading ? <ActivityIndicator color="#fff" /> : <Text style={s.publishText}>פרסם ←</Text>}
+          {loading ? <ActivityIndicator color="#fff" /> : <Text style={s.publishText}>{isEdit ? 'עדכן פרסום ←' : 'פרסם ←'}</Text>}
         </TouchableOpacity>
 
         <View style={{ height: 40 }} />
@@ -391,6 +430,7 @@ export default function SellScreen() {
 const s = StyleSheet.create({
   root: { flex: 1 },
   header: { paddingHorizontal: 20, paddingTop: 60, paddingBottom: 16 },
+  backBtn: { marginBottom: 8 },
   title: { fontSize: 24, fontWeight: '900', letterSpacing: -0.5 },
   sub: { fontSize: 12, marginTop: 3 },
   scroll: { flex: 1, paddingHorizontal: 16 },
@@ -440,3 +480,5 @@ const s = StyleSheet.create({
   captureBtn: { width: 72, height: 72, borderRadius: 36, backgroundColor: 'rgba(255,255,255,0.3)', alignItems: 'center', justifyContent: 'center', borderWidth: 3, borderColor: '#fff' },
   captureBtnInner: { width: 56, height: 56, borderRadius: 28, backgroundColor: '#fff' },
 });
+
+// bs-simple.com | בועז סעדה - פתרונות יצירתיים
