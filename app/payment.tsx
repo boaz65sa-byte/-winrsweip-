@@ -14,9 +14,12 @@ export default function PaymentScreen() {
   const params = useLocalSearchParams();
 
   const listingId = params.listingId as string;
-  const amount = Number(params.amount);
   const title = params.title as string;
-  const safeTradeFee = Math.round(amount * 0.02);
+  // These are only a display estimate for the initial render — the server
+  // (create-payment-intent) independently looks up the real price and is
+  // the only source of truth for what Stripe actually charges.
+  const [amount, setAmount] = useState(Number(params.amount) || 0);
+  const [safeTradeFee, setSafeTradeFee] = useState(Math.round((Number(params.amount) || 0) * 0.02));
   const total = amount + safeTradeFee;
 
   const pay = async () => {
@@ -26,12 +29,7 @@ export default function PaymentScreen() {
       if (!user) { Alert.alert('שגיאה', 'התחבר קודם'); return; }
 
       const { data, error } = await supabase.functions.invoke('create-payment-intent', {
-        body: {
-          amount: total * 100,
-          currency: 'ils',
-          listingId,
-          userId: user.id,
-        },
+        body: { listingId },
       });
 
       if (error || data?.error) {
@@ -41,6 +39,8 @@ export default function PaymentScreen() {
       if (!data?.clientSecret) {
         throw new Error((data as any)?.error || 'לא התקבל clientSecret מהשרת');
       }
+      if (typeof data.amount === 'number') setAmount(data.amount);
+      if (typeof data.safeTradeFee === 'number') setSafeTradeFee(data.safeTradeFee);
 
       const { error: initError } = await initPaymentSheet({
         merchantDisplayName: 'SwipeBid',
@@ -67,17 +67,10 @@ export default function PaymentScreen() {
         return;
       }
 
-      await supabase.from('listings').update({ status: 'sold' }).eq('id', listingId);
-      await supabase.from('escrow_transactions').upsert({
-        listing_id: listingId,
-        buyer_id: user.id,
-        amount,
-        safe_trade_fee: safeTradeFee,
-        platform_fee: Math.round(amount * 0.10),
-        status: 'holding',
-        paid: true,
-      }, { onConflict: 'listing_id' });
-
+      // Do NOT write `paid`/`status: 'sold'` here — the client cannot be
+      // trusted to report its own payment success. The stripe-webhook
+      // function updates escrow_transactions/listings once Stripe confirms
+      // the charge server-side (payment_intent.succeeded).
       Alert.alert('תשלום הצליח! 🎉', 'הכסף מוחזק בנאמנות עד קבלת הפריט.');
       router.replace('/won');
 

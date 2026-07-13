@@ -126,6 +126,10 @@ export default function App() {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { Alert.alert('שגיאה', 'התחבר קודם'); return; }
+      if (user.id === product.seller_id) {
+        Alert.alert('שגיאה', 'לא ניתן להגיש הצעה על המוצר שלך');
+        return;
+      }
 
       // שלוף הבידר הקודם לפני העדכון
       const { data: prevBid } = await supabase
@@ -137,10 +141,9 @@ export default function App() {
         .single();
 
       const safeTradeFee = Math.round(amount * 0.02);
-      const platformFee = Math.round(amount * 0.10);
 
-      await supabase.from('bids').insert({ listing_id: product.id, bidder_id: user.id, amount });
-      await supabase.from('listings').update({ current_bid: amount }).eq('id', product.id);
+      const { error: bidError } = await supabase.from('bids').insert({ listing_id: product.id, bidder_id: user.id, amount });
+      if (bidError) throw new Error(bidError.message);
 
       // התראה לבידר הקודם — עקפו אותו
       if (prevBid?.bidder_id && prevBid.bidder_id !== user.id) {
@@ -161,16 +164,6 @@ export default function App() {
           { screen: '/profile' }
         );
       }
-      await supabase.from('escrow_transactions').upsert({
-        listing_id: product.id,
-        buyer_id: user.id,
-        seller_id: product.seller_id,
-        amount,
-        safe_trade_fee: safeTradeFee,
-        platform_fee: platformFee,
-        status: 'holding',
-      }, { onConflict: 'listing_id' });
-
       const isMatch = product.reserve_price && amount >= product.reserve_price;
       if (isMatch) {
         await supabase.from('listings').update({

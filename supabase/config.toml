@@ -1,11 +1,23 @@
 
 [functions.create-payment-intent]
 enabled = true
-verify_jwt = false
+# Requires a logged-in user's JWT — the function also independently
+# verifies the caller and looks up the real price server-side.
+verify_jwt = true
 import_map = "./functions/create-payment-intent/deno.json"
 entrypoint = "./functions/create-payment-intent/index.ts"
 
 [functions.send-notification]
 enabled = true
-verify_jwt = false
+# Only called by the notify_auction_winners() pg_cron job (using the
+# service-role key) and other server-side code — never by app clients.
+verify_jwt = true
 entrypoint = "./functions/send-notification/index.ts"
+
+[functions.stripe-webhook]
+enabled = true
+# Called by Stripe, not by a logged-in user — no Supabase JWT exists.
+# Authenticity is verified inside the function via the Stripe-Signature
+# header against STRIPE_WEBHOOK_SECRET instead.
+verify_jwt = false
+entrypoint = "./functions/stripe-webhook/index.ts"
