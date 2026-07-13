@@ -34,7 +34,8 @@ export async function middleware(request: NextRequest) {
     request.nextUrl.pathname.startsWith('/auth') ||
     request.nextUrl.pathname.startsWith('/reset-password') ||
     request.nextUrl.pathname.startsWith('/privacy') ||
-    request.nextUrl.pathname.startsWith('/terms');
+    request.nextUrl.pathname.startsWith('/terms') ||
+    request.nextUrl.pathname.startsWith('/support');
 
   if (!user && !isPublicPath) {
     return NextResponse.redirect(new URL('/login', request.url));

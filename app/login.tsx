@@ -1,7 +1,8 @@
+import * as AppleAuthentication from 'expo-apple-authentication';
 import * as WebBrowser from 'expo-web-browser';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { supabase } from '../lib/supabase';
 
@@ -12,7 +13,14 @@ export default function LoginScreen() {
   const [phone, setPhone] = useState('');
   const [isRegister, setIsRegister] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [appleAvailable, setAppleAvailable] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    if (Platform.OS === 'ios') {
+      AppleAuthentication.isAvailableAsync().then(setAppleAvailable);
+    }
+  }, []);
 
   const handleAuth = async () => {
     if (!email || !password) {
@@ -62,6 +70,42 @@ export default function LoginScreen() {
       Alert.alert('שגיאה', error.message);
     } else {
       Alert.alert('נשלח! ✓', 'בדוק את המייל שלך לאיפוס סיסמה');
+    }
+  };
+
+  const handleApple = async () => {
+    try {
+      const credential = await AppleAuthentication.signInAsync({
+        requestedScopes: [
+          AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+          AppleAuthentication.AppleAuthenticationScope.EMAIL,
+        ],
+      });
+
+      if (!credential.identityToken) {
+        Alert.alert('שגיאה', 'לא התקבל אישור מ-Apple');
+        return;
+      }
+
+      const { error } = await supabase.auth.signInWithIdToken({
+        provider: 'apple',
+        token: credential.identityToken,
+      });
+      if (error) throw error;
+
+      // Apple only returns the name on the very first sign-in ever.
+      const name = credential.fullName
+        ? [credential.fullName.givenName, credential.fullName.familyName].filter(Boolean).join(' ')
+        : null;
+      if (name) {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) await supabase.from('users').update({ full_name: name }).eq('id', user.id);
+      }
+
+      router.replace('/');
+    } catch (e: any) {
+      if (e.code === 'ERR_REQUEST_CANCELED') return;
+      Alert.alert('שגיאה', e.message || 'משהו השתבש');
     }
   };
 
@@ -164,6 +208,16 @@ export default function LoginScreen() {
           <View style={s.dividerLine} />
         </View>
 
+        {appleAvailable && (
+          <AppleAuthentication.AppleAuthenticationButton
+            buttonType={AppleAuthentication.AppleAuthenticationButtonType.CONTINUE}
+            buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.WHITE}
+            cornerRadius={14}
+            style={s.appleBtn}
+            onPress={handleApple}
+          />
+        )}
+
         <TouchableOpacity style={s.googleBtn} onPress={handleGoogle}>
           <Text style={s.googleIcon}>G</Text>
           <Text style={s.googleText}>המשך עם Google</Text>
@@ -202,6 +256,7 @@ const s = StyleSheet.create({
   divider: { flexDirection: 'row', alignItems: 'center', gap: 10, marginVertical: 16 },
   dividerLine: { flex: 1, height: 1, backgroundColor: '#2A2A2A' },
   dividerText: { color: '#444', fontSize: 12 },
+  appleBtn: { width: '100%', height: 48, marginBottom: 12 },
   googleBtn: { backgroundColor: '#fff', borderRadius: 14, padding: 14, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10 },
   googleIcon: { fontSize: 18, fontWeight: '900', color: '#FF4D1C' },
   googleText: { fontSize: 15, fontWeight: '700', color: '#1A1A1A' },
