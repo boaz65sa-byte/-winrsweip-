@@ -11,7 +11,9 @@
         "simulator": false
       },
       "env": {
-        "EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY": "pk_test_51TDtnV1Ctpbq110omt8d5UcoIrSG16xGbmz4Hpc2y1XiYMGrZIVrHrexVjOVnA469qMLW3pLXj1sEhMCAiO3NPra00JxZZDa8S"
+        "EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY": "pk_test_51TDtnV1Ctpbq110omt8d5UcoIrSG16xGbmz4Hpc2y1XiYMGrZIVrHrexVjOVnA469qMLW3pLXj1sEhMCAiO3NPra00JxZZDa8S",
+        "EXPO_PUBLIC_SUPABASE_URL": "https://onmcbwieonuazwlsxhor.supabase.co",
+        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9ubWNid2llb251YXp3bHN4aG9yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM5NDc4NjIsImV4cCI6MjA5OTUyMzg2Mn0.yn_KPUlK2QFUzi9c9CyMJzunVj0oOQ9aOLOzKvv04vw"
       }
     },
     "preview": {
@@ -20,7 +22,9 @@
         "resourceClass": "m-medium"
       },
       "env": {
-        "EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY": "pk_test_51TDtnV1Ctpbq110omt8d5UcoIrSG16xGbmz4Hpc2y1XiYMGrZIVrHrexVjOVnA469qMLW3pLXj1sEhMCAiO3NPra00JxZZDa8S"
+        "EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY": "pk_test_51TDtnV1Ctpbq110omt8d5UcoIrSG16xGbmz4Hpc2y1XiYMGrZIVrHrexVjOVnA469qMLW3pLXj1sEhMCAiO3NPra00JxZZDa8S",
+        "EXPO_PUBLIC_SUPABASE_URL": "https://onmcbwieonuazwlsxhor.supabase.co",
+        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9ubWNid2llb251YXp3bHN4aG9yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM5NDc4NjIsImV4cCI6MjA5OTUyMzg2Mn0.yn_KPUlK2QFUzi9c9CyMJzunVj0oOQ9aOLOzKvv04vw"
       }
     },
     "production": {
@@ -29,7 +33,9 @@
         "resourceClass": "m-medium"
       },
       "env": {
-        "EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY": "pk_test_51TDtnV1Ctpbq110omt8d5UcoIrSG16xGbmz4Hpc2y1XiYMGrZIVrHrexVjOVnA469qMLW3pLXj1sEhMCAiO3NPra00JxZZDa8S"
+        "EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY": "pk_test_51TDtnV1Ctpbq110omt8d5UcoIrSG16xGbmz4Hpc2y1XiYMGrZIVrHrexVjOVnA469qMLW3pLXj1sEhMCAiO3NPra00JxZZDa8S",
+        "EXPO_PUBLIC_SUPABASE_URL": "https://onmcbwieonuazwlsxhor.supabase.co",
+        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9ubWNid2llb251YXp3bHN4aG9yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM5NDc4NjIsImV4cCI6MjA5OTUyMzg2Mn0.yn_KPUlK2QFUzi9c9CyMJzunVj0oOQ9aOLOzKvv04vw"
       }
     }
   },
