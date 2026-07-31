@@ -23,10 +23,16 @@ Supabase backend, admin web dashboard (`web/`). Package/bundle managed via EAS.
   payments won't work until a live Stripe account is linked.
 
 ## Plan to finish (no Mac required — EAS Build compiles iOS in the cloud)
-1. [ ] `eas login` (user does this locally — password never passed through automation)
-2. [ ] Get real `EXPO_PUBLIC_SUPABASE_URL` / `EXPO_PUBLIC_SUPABASE_ANON_KEY` for `winrswipe-prod`,
-       wire into `eas.json` → `build.production.env`
-3. [ ] Set up a real demo/reviewer account, add it to App Store Connect → Sign-In Information
+1. [x] `eas login` — authenticated as `boaz65sa`
+2. [x] Got real `EXPO_PUBLIC_SUPABASE_URL` / `EXPO_PUBLIC_SUPABASE_ANON_KEY` for `winrswipe-prod`
+       (project was paused on the free tier, not deleted — restored it), wired into all three
+       `eas.json` build profiles, committed
+3. [x] Demo/reviewer account created and verified working end-to-end:
+       `appreview@bs-simple.com` / `Boaz6565` (had to also flip Email provider on in
+       Supabase Auth settings — it was disabled project-wide). Confirmed via a direct
+       `POST /auth/v1/token?grant_type=password` call, got a real access token back.
+   - [ ] Still needs to be entered into App Store Connect → Sign-In Information (user action,
+         domain is blocked for my browser tools — same restriction hit with Facebook earlier)
 4. [ ] `eas build --platform android --profile production`
 5. [ ] `eas build --platform ios --profile production`
 6. [ ] Pick up the Draft app in Play Console: check pricing (paid/free — the #1 gotcha from the
@@ -39,3 +45,5 @@ Supabase backend, admin web dashboard (`web/`). Package/bundle managed via EAS.
 - `google-play-service-account.json` (needed for automated `eas submit --platform android`) is
   not present locally — either locate it, generate a new one via Google Cloud Console, or upload
   the AAB to Play Console manually instead.
+- Apple Developer Program License Agreement had to be re-accepted by the user before App Store
+  Connect / Certificates access worked again (blocking banner on developer.apple.com/account).
