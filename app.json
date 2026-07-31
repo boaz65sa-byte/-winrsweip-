@@ -12,7 +12,7 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.winrswipe.app",
-      "buildNumber": "1",
+      "buildNumber": "2",
       "infoPlist": {
         "NSCameraUsageDescription": "WinrSwipe uses your camera to photograph items you want to sell.",
         "NSPhotoLibraryUsageDescription": "WinrSwipe uses your photo library to upload product images.",
@@ -25,7 +25,7 @@
     },
     "android": {
       "package": "com.winrswipe.app",
-      "versionCode": 1,
+      "versionCode": 3,
       "adaptiveIcon": {
         "backgroundColor": "#0D0D0D",
         "foregroundImage": "./assets/images/android-icon-foreground.png",

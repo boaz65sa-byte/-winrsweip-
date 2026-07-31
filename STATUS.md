@@ -33,8 +33,11 @@ Supabase backend, admin web dashboard (`web/`). Package/bundle managed via EAS.
        `POST /auth/v1/token?grant_type=password` call, got a real access token back.
    - [ ] Still needs to be entered into App Store Connect → Sign-In Information (user action,
          domain is blocked for my browser tools — same restriction hit with Facebook earlier)
-4. [ ] `eas build --platform android --profile production`
-5. [ ] `eas build --platform ios --profile production`
+4. [x] `eas build --platform android --profile production` — running:
+       https://expo.dev/accounts/boaz65sa/projects/swipebid-app2/builds/14843119-105b-44ab-856c-3dae237fd88d
+5. [x] `eas build --platform ios --profile production` — running (reused stored Apple
+       distribution cert/provisioning profile, no fresh Apple login needed):
+       https://expo.dev/accounts/boaz65sa/projects/swipebid-app2/builds/ae511904-8618-401a-aaee-31999390a95b
 6. [ ] Pick up the Draft app in Play Console: check pricing (paid/free — the #1 gotcha from the
        bouzoukifret submission), fill content declarations, upload the AAB
 7. [ ] `eas submit --platform ios` (or manual App Store Connect upload) — addresses the 3 fixed
