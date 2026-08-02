@@ -25,7 +25,7 @@
     },
     "android": {
       "package": "com.winrswipe.app",
-      "versionCode": 3,
+      "versionCode": 6,
       "adaptiveIcon": {
         "backgroundColor": "#0D0D0D",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
