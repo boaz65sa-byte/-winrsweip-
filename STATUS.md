@@ -43,11 +43,29 @@ Supabase backend, admin web dashboard (`web/`). Package/bundle managed via EAS.
        (developer.apple.com → Identifiers → com.winrswipe.app) — EAS then auto-detected the old
        profile was invalid and generated a fresh one (`QG96YK6WYS`). Rebuild (`60c67243`) is
        running: https://expo.dev/accounts/boaz65sa/projects/swipebid-app2/builds/60c67243-878d-48f1-97e9-303662726053
-6. [ ] Pick up the Draft app in Play Console: check pricing (paid/free — the #1 gotcha from the
-       bouzoukifret submission), fill content declarations, upload the AAB
-7. [ ] `eas submit --platform ios` (or manual App Store Connect upload) — addresses the 3 fixed
+6. [x] Play Console content declarations — **all complete** (2026-08-02):
+       - Privacy policy, ads (none), app access, content rating (IARC), target audience: done
+         in an earlier pass.
+       - Data Safety section: filled all 13 data types collected (personal info, financial info,
+         location, photos, in-app messages, device/other IDs), each with collection/ephemeral/
+         required-optional/purpose answers reflecting real app behavior (escrow marketplace with
+         chat, product photos, and location-based nearby-auction discovery). Saved and finalized
+         at the Preview step.
+       - Advertising ID: No (no ad SDK).
+       - Government apps: No.
+       - Financial features: **Yes** — checked "Payments via mobile device and digital wallets"
+         (Stripe-based buyer/seller escrow payments are real, so this wasn't a blanket "none of
+         the above" like the other simple apps on this account).
+       - Health apps: None of the above.
+       - Play Console app-content overview now shows 0 items requiring attention.
+       - Still need to pick pricing (paid/free) and actually upload the AAB to a release track —
+         not yet done.
+7. [ ] Pick up the Draft app's release track: check pricing (paid/free — the #1 gotcha from the
+       bouzoukifret submission), upload the AAB
+       (https://expo.dev/artifacts/eas/UhLJDNqoX9mczSSu4Lzfk4DUJ2hkJN5uKCWH2rTUhMo.aab)
+8. [ ] `eas submit --platform ios` (or manual App Store Connect upload) — addresses the 3 fixed
        rejection reasons
-8. [ ] Decide when to move Stripe from test → live key
+9. [ ] Decide when to move Stripe from test → live key
 
 ## Notes
 - `google-play-service-account.json` (needed for automated `eas submit --platform android`) is
