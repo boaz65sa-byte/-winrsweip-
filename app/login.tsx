@@ -160,7 +160,7 @@ export default function LoginScreen() {
               </View>
               <TextInput
                 style={s.phoneInput}
-                placeholder="05X-XXXXXXX"
+                placeholder="05X-XXXXXXX (לא חובה)"
                 placeholderTextColor="#444"
                 value={phone}
                 onChangeText={setPhone}
