@@ -80,8 +80,22 @@ Supabase backend, admin web dashboard (`web/`). Package/bundle managed via EAS.
              track — was present but not yet turned on for Internal Testing.
    **Android is done** for this pass: content declarations complete, pricing confirmed free,
    AAB (v6) live on Internal Testing with 4 testers assigned.
-8. [ ] `eas submit --platform ios` (or manual App Store Connect upload) — addresses the 3 fixed
-       rejection reasons
+8. [x] `eas submit --platform ios` — succeeded on the second attempt:
+       - First try (build #4, the original build from this pass) failed with a generic
+         "Something went wrong when submitting your app to Apple App Store Connect" — no
+         further detail available (App Store Connect is domain-blocked for my browser tools,
+         and `eas submission:view` isn't a real command). Given the identical symptom just
+         hit on Android (silent reuse of an already-used version identifier), the working
+         theory is build number 4 was already consumed by an earlier attempt.
+       - Fix: bumped `app.json`'s `ios.buildNumber` (4 → 6 → auto-incremented to 7 by EAS on
+         rebuild), same pattern as the Android versionCode fix. Also had to add
+         `submit.production.ios.ascAppId: "6760982270"` to `eas.json` — submit was failing
+         immediately without it ("Set ascAppId in the submit profile").
+       - New build (#7): https://expo.dev/accounts/boaz65sa/projects/swipebid-app2/builds/f799817f-4072-4ba1-a0f3-510cdbf7aa22
+       - Submission succeeded: uploaded to App Store Connect, now Apple-side processing
+         (~5-10 min). TestFlight: https://appstoreconnect.apple.com/apps/6760982270/testflight/ios
+       - [ ] Once processing finishes, still need to: add build to a TestFlight group /
+             submit for App Review (manual step in App Store Connect — domain-blocked here).
 9. [ ] Decide when to move Stripe from test → live key
 
 ## Notes
