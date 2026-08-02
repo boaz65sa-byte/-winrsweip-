@@ -96,6 +96,39 @@ Supabase backend, admin web dashboard (`web/`). Package/bundle managed via EAS.
          (~5-10 min). TestFlight: https://appstoreconnect.apple.com/apps/6760982270/testflight/ios
        - [ ] Once processing finishes, still need to: add build to a TestFlight group /
              submit for App Review (manual step in App Store Connect — domain-blocked here).
+
+## New findings from the resend rejection email (2026-08-02)
+User pasted Apple's "still needs attention" email for the **original** rejected submission
+(92628e90-730c-4e44-aaaa-7657a1ac0dfd, reviewed 2026-08-01, version "1.0 (13)" — an older
+build number than anything in this repo's `app.json` history, so this refers to whatever was
+submitted before this pass, likely via Xcode/Transporter directly). Four issues listed:
+
+1. **Guideline 4.8 (Login Services)** — same as before, addressed by the Apple Sign-In work.
+2. **Guideline 5.1.1(v) (Privacy) — NEW, not previously known**: phone number required but not
+   core to the app. Root cause: `app/login.tsx`'s registration form showed the phone field with
+   no "optional" indication (even though nothing in code or the DB schema actually enforces it —
+   `supabase/migrations/001_initial_schema.sql` has `phone TEXT` with no NOT NULL). Fixed by
+   adding "(לא חובה)" to the placeholder text. Commit 4b501cb.
+3. **Guideline 2.1(a) (App Completeness)** — same as before, addressed by the env var fix.
+4. **Guideline 1.5 (Support URL)** — **still actually broken right now**, confirmed by curl:
+   both `https://winrsweip-boaz-s-projects-6bda35e8.vercel.app` and its `/support` subpage
+   return `302` redirects to `vercel.com/sso-api` (Vercel's deployment-protection wall), so
+   Apple's reviewer genuinely can't reach it. This is NOT a stale/already-fixed complaint —
+   it's a live bug.
+   - Diagnosed via `vercel project protection --json` (shows `ssoProtection: null`, so it's not
+     the per-project SSO toggle) and `vercel inspect <url>` (deployment is "Ready", aliases
+     include both `winrsweip.vercel.app` — which 404s, wrong/different project — and the
+     `-boaz-s-projects-6bda35e8` one — which is the one actually serving our content, but
+     behind the wall). This looks like Vercel's automatic "Vercel Authentication" /
+     Deployment Protection feature for auto-generated `*.vercel.app` URLs, which isn't exposed
+     by the `vercel project protection` CLI subcommand (that only covers SSO/password/git-fork/
+     skew) — couldn't fix or fully diagnose via CLI.
+   - **vercel.com is domain-blocked for my browser tools** (same restriction as
+     appstoreconnect.apple.com) — the user needs to open Vercel's dashboard themselves:
+     Project **-winrsweip-** → Settings → **Deployment Protection** → find the "Vercel
+     Authentication" toggle and either disable it, or set it to apply to Preview only (not
+     Production), or attach a real custom domain (custom domains typically bypass this
+     protection entirely, unlike the raw `*.vercel.app` URLs). **Not yet resolved.**
 9. [ ] Decide when to move Stripe from test → live key
 
 ## Notes
