@@ -12,7 +12,7 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.winrswipe.app",
-      "buildNumber": "4",
+      "buildNumber": "7",
       "infoPlist": {
         "NSCameraUsageDescription": "WinrSwipe uses your camera to photograph items you want to sell.",
         "NSPhotoLibraryUsageDescription": "WinrSwipe uses your photo library to upload product images.",
