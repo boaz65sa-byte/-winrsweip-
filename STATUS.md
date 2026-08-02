@@ -69,8 +69,17 @@ Supabase backend, admin web dashboard (`web/`). Package/bundle managed via EAS.
              https://expo.dev/accounts/boaz65sa/projects/swipebid-app2/builds/735a30c9-981b-4e9d-8224-ec68d287b980
              AAB downloaded to `build-artifacts/winrswipe-v6-release.aab` (85.6MB — over the
              browser tool's 10MB upload cap, so the user uploads it manually each time).
-       - [ ] User re-uploading v6 AAB to internal testing track now.
-       - [ ] Fill release name/notes, add testers, roll out.
+       - [x] User uploaded v6 AAB. First attempt bundled v3+v6 together in one release
+             (both got added before v3 was removed) — removed the stale v3 bundle via the
+             file's "⋮" menu → "הסרה של App Bundle" before continuing.
+       - [x] Fixed the auto-filled release name (was still showing "3", updated to "6").
+       - [x] Release notes (Hebrew) filled in.
+       - [x] Published (2026-08-02, user confirmed before the publish click) — track status
+             is now Active, version 6 (1.0.0) live to Internal Testing.
+       - [x] Enabled the existing "בודקים ראשוניים" (initial testers) list (4 users) for this
+             track — was present but not yet turned on for Internal Testing.
+   **Android is done** for this pass: content declarations complete, pricing confirmed free,
+   AAB (v6) live on Internal Testing with 4 testers assigned.
 8. [ ] `eas submit --platform ios` (or manual App Store Connect upload) — addresses the 3 fixed
        rejection reasons
 9. [ ] Decide when to move Stripe from test → live key
