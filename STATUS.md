@@ -60,9 +60,17 @@ Supabase backend, admin web dashboard (`web/`). Package/bundle managed via EAS.
        - Play Console app-content overview now shows 0 items requiring attention.
        - Still need to pick pricing (paid/free) and actually upload the AAB to a release track —
          not yet done.
-7. [ ] Pick up the Draft app's release track: check pricing (paid/free — the #1 gotcha from the
-       bouzoukifret submission), upload the AAB
-       (https://expo.dev/artifacts/eas/UhLJDNqoX9mczSSu4Lzfk4DUJ2hkJN5uKCWH2rTUhMo.aab)
+7. [~] Pick up the Draft app's release track:
+       - [x] Pricing confirmed Free (no paid/free gotcha here).
+       - [x] Internal testing track: first upload attempt (v3 AAB) rejected — "version code 3
+             already used" (leftover from the original March draft app). Bumped
+             `app.json`'s `android.versionCode` to 5; EAS auto-incremented to 6 on rebuild.
+       - [x] New build finished: version code 6,
+             https://expo.dev/accounts/boaz65sa/projects/swipebid-app2/builds/735a30c9-981b-4e9d-8224-ec68d287b980
+             AAB downloaded to `build-artifacts/winrswipe-v6-release.aab` (85.6MB — over the
+             browser tool's 10MB upload cap, so the user uploads it manually each time).
+       - [ ] User re-uploading v6 AAB to internal testing track now.
+       - [ ] Fill release name/notes, add testers, roll out.
 8. [ ] `eas submit --platform ios` (or manual App Store Connect upload) — addresses the 3 fixed
        rejection reasons
 9. [ ] Decide when to move Stripe from test → live key
