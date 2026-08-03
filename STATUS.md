@@ -123,12 +123,18 @@ submitted before this pass, likely via Xcode/Transporter directly). Four issues 
      Deployment Protection feature for auto-generated `*.vercel.app` URLs, which isn't exposed
      by the `vercel project protection` CLI subcommand (that only covers SSO/password/git-fork/
      skew) — couldn't fix or fully diagnose via CLI.
-   - **vercel.com is domain-blocked for my browser tools** (same restriction as
-     appstoreconnect.apple.com) — the user needs to open Vercel's dashboard themselves:
-     Project **-winrsweip-** → Settings → **Deployment Protection** → find the "Vercel
-     Authentication" toggle and either disable it, or set it to apply to Preview only (not
-     Production), or attach a real custom domain (custom domains typically bypass this
-     protection entirely, unlike the raw `*.vercel.app` URLs). **Not yet resolved.**
+   - **RESOLVED (2026-08-03).** vercel.com is domain-blocked for my browser tools, so the user
+     opened the dashboard themselves — found Settings → Deployment Protection → "Vercel
+     Authentication" → "Require Log In" was ON, turned it off, saved.
+   - That alone still 404'd though — a **second, independent bug**: the `-winrsweip-` Vercel
+     project's Root Directory was set to `.` (repo root) instead of `web/` (where the actual
+     Next.js app lives — confirmed via `web/package.json` name `winrswipe-web`), so production
+     was serving an empty/wrong build. `vercel project update` doesn't expose a Root Directory
+     flag, so fixed by linking and deploying directly from `web/` instead:
+     `cd web && npx vercel link --yes --project="-winrsweip-" && npx vercel --prod --yes`
+     — this deploy actually built `/support` and `/privacy` routes and got aliased to
+     `winrsweip-boaz-s-projects-6bda35e8.vercel.app`.
+   - Verified both now return `200 OK` via curl. Support/Privacy URLs are genuinely fixed.
 9. [ ] Decide when to move Stripe from test → live key
 
 ## Notes
