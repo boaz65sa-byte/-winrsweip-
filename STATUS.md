@@ -94,8 +94,22 @@ Supabase backend, admin web dashboard (`web/`). Package/bundle managed via EAS.
        - New build (#7): https://expo.dev/accounts/boaz65sa/projects/swipebid-app2/builds/f799817f-4072-4ba1-a0f3-510cdbf7aa22
        - Submission succeeded: uploaded to App Store Connect, now Apple-side processing
          (~5-10 min). TestFlight: https://appstoreconnect.apple.com/apps/6760982270/testflight/ios
-       - [ ] Once processing finishes, still need to: add build to a TestFlight group /
-             submit for App Review (manual step in App Store Connect — domain-blocked here).
+       - [x] Build #7 processed by Apple, user attached it to the previously-rejected 1.0
+             submission in App Store Connect, selected it in "Add Build", and clicked
+             Submit for Review. **Confirmed submitted (2026-08-03).**
+
+## Final status (2026-08-03)
+- **Android**: v6 live on Internal Testing, content declarations complete, pricing free.
+- **iOS**: build #7 submitted for App Review with all 4 rejection reasons addressed:
+  1. Guideline 4.8 (Login) — Sign in with Apple
+  2. Guideline 5.1.1(v) (Privacy/phone) — phone marked optional in `app/login.tsx`
+  3. Guideline 2.1(a) (App Completeness) — Supabase env vars fixed
+  4. Guideline 1.5 (Support URL) — Vercel Authentication wall disabled + redeployed from the
+     correct `web/` subdirectory; verified `/support` and `/privacy` return 200 via curl.
+- Cross-account testers: shared "בודקים ראשוניים" email list (used by WinrSwipe, bouzoukifret,
+  and laeloy) grown to 10 addresses at the user's request. Opt-in link for bouzoukifret verified
+  working: `https://play.google.com/apps/testing/app.vercel.bouzoukifret.twa`.
+- Stripe still on a test key — deferred, no user decision yet.
 
 ## New findings from the resend rejection email (2026-08-02)
 User pasted Apple's "still needs attention" email for the **original** rejected submission
