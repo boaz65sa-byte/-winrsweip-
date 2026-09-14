@@ -1,16 +1,39 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL
-const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY
+/**
+ * Live WinrSwipe backend. These values are the public anon/publishable key
+ * (safe to ship in the client). EAS `build.*.env` should match; if a stale
+ * dashboard secret still points at a deleted project, we remap below so a
+ * production iOS build can actually authenticate.
+ */
+export const LIVE_SUPABASE_URL = 'https://xkydgfjiofsdqsbozuha.supabase.co'
+export const LIVE_SUPABASE_ANON_KEY = 'sb_publishable_k-MWNYGfyK9QzaAZFnF9GQ_fB07Vq5g'
+
+/** Deleted / paused projects previously shipped in eas.json — DNS NXDOMAIN. */
+const RETIRED_SUPABASE_HOSTS = [
+  'onmcbwieonuazwlsxhor',
+  'qxpueymbeawmlroknjwe',
+  'msozsfuogkxtnqtidwig',
+]
+
+export function resolveSupabaseConfig(
+  url = process.env.EXPO_PUBLIC_SUPABASE_URL,
+  key = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY,
+) {
+  const retired = !!url && RETIRED_SUPABASE_HOSTS.some((host) => url.includes(host))
+  if (!url || retired) {
+    return { url: LIVE_SUPABASE_URL, key: LIVE_SUPABASE_ANON_KEY, remapped: true as const }
+  }
+  if (!key) {
+    return { url: LIVE_SUPABASE_URL, key: LIVE_SUPABASE_ANON_KEY, remapped: true as const }
+  }
+  return { url, key, remapped: false as const }
+}
+
+const { url: supabaseUrl, key: supabaseAnonKey } = resolveSupabaseConfig()
 
 if (!supabaseUrl || !supabaseAnonKey) {
-  // Fail loudly at startup instead of silently passing `undefined` into
-  // createClient (which otherwise surfaces as a confusing error deep inside
-  // whatever screen happens to touch `supabase` first). eas.json's build.env
-  // only defines EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY — these two must be set
-  // as EAS environment variables/secrets (`eas env:list`) for every build
-  // profile, or builds ship with a broken Supabase client.
   throw new Error(
     'Missing EXPO_PUBLIC_SUPABASE_URL / EXPO_PUBLIC_SUPABASE_ANON_KEY — set them as EAS environment variables for this build profile.'
   )

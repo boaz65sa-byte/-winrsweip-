@@ -1,8 +1,8 @@
 import { StripeProvider } from '@stripe/stripe-react-native';
 import * as Notifications from 'expo-notifications';
-import { Tabs, useRouter } from "expo-router";
+import { Tabs, useRouter, useSegments } from "expo-router";
 import { createContext, useEffect, useRef, useState } from "react";
-import { Text } from "react-native";
+import { ActivityIndicator, Text, View } from "react-native";
 import { registerForPushNotifications, savePushToken } from '../lib/notifications';
 import { supabase } from "../lib/supabase";
 
@@ -34,6 +34,7 @@ export default function RootLayout() {
   const [user, setUser] = useState<any>(null);
   const [ready, setReady] = useState(false);
   const router = useRouter();
+  const segments = useSegments();
   const notificationListener = useRef<Notifications.Subscription>();
   const responseListener = useRef<Notifications.Subscription>();
 
@@ -74,8 +75,18 @@ export default function RootLayout() {
 
   useEffect(() => {
     if (!ready) return;
-    if (!user) router.replace('/login');
-  }, [ready, user]);
+    const onLogin = segments[0] === 'login';
+    if (!user && !onLogin) router.replace('/login');
+    else if (user && onLogin) router.replace('/');
+  }, [ready, user, segments, router]);
+
+  if (!ready) {
+    return (
+      <View style={{ flex: 1, backgroundColor: '#0D0D0D', alignItems: 'center', justifyContent: 'center' }}>
+        <ActivityIndicator color="#FF4D1C" size="large" />
+      </View>
+    );
+  }
 
   const isAdmin = user?.email === ADMIN_EMAIL;
 

@@ -31,7 +31,10 @@ export default function App() {
   const translateX = useSharedValue(0);
   const translateY = useSharedValue(0);
 
-  useEffect(() => { detectCity(); }, []);
+  useEffect(() => {
+    if (!theme.user) return;
+    detectCity();
+  }, [theme.user]);
   useEffect(() => { loadListings(); }, [cityFilter]);
 
   useEffect(() => {
@@ -61,7 +64,9 @@ export default function App() {
       const [address] = await Location.reverseGeocodeAsync(loc.coords);
       if (address?.city) {
         setUserCity(address.city);
-        setCityFilter(address.city);
+        // Keep the default "all listings" filter. Auto-switching to the
+        // reviewer's local city (e.g. Cupertino) would hide every Israeli
+        // auction and look like a broken post-login state.
       }
     } catch (e) {
       // no location — show all
