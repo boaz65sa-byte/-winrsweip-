@@ -174,7 +174,7 @@ export default function ProfileScreen() {
                 <View style={[s.phonePrefix, { backgroundColor: theme.input, borderColor: theme.border }]}>
                   <Text style={{ color: theme.text, fontSize: 14 }}>🇮🇱 +972</Text>
                 </View>
-                <TextInput style={[s.phoneInput, { backgroundColor: theme.input, borderColor: theme.border, color: theme.text }]} value={phone} onChangeText={setPhone} placeholder="05X-XXXXXXX" placeholderTextColor={theme.sub} keyboardType="phone-pad" />
+                <TextInput style={[s.phoneInput, { backgroundColor: theme.input, borderColor: theme.border, color: theme.text }]} value={phone} onChangeText={setPhone} placeholder="Phone (optional) / 05X-XXXXXXX" placeholderTextColor={theme.sub} keyboardType="phone-pad" />
               </View>
               <Text style={[s.editSection, { color: theme.sub, marginTop: 8 }]}>כתובת למשלוח</Text>
               <TextInput style={[s.editInput, { backgroundColor: theme.input, borderColor: theme.border, color: theme.text }]} value={shippingAddress} onChangeText={setShippingAddress} placeholder="רחוב ומספר" placeholderTextColor={theme.sub} />

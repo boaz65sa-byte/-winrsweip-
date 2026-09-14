@@ -12,6 +12,7 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.winrswipe.app",
+      "usesAppleSignIn": true,
       "buildNumber": "7",
       "infoPlist": {
         "NSCameraUsageDescription": "WinrSwipe uses your camera to photograph items you want to sell.",
