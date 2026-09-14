@@ -19,6 +19,13 @@ test('production EAS profile points at the live Supabase project', () => {
   }
 });
 
+test('registration copy marks phone as optional in English', () => {
+  const login = readFileSync(join(root, 'app/login.tsx'), 'utf8');
+  assert.match(login, /Phone \(optional\)/);
+  assert.match(login, /Not required to create an account/);
+  assert.doesNotMatch(login, /if \(!email \|\| !password \|\| !phone\)/);
+});
+
 test('iOS explicitly enables Sign in with Apple', () => {
   const app = JSON.parse(readFileSync(join(root, 'app.json'), 'utf8'));
   assert.equal(app.expo.ios.usesAppleSignIn, true);

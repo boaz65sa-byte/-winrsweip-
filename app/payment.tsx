@@ -1,8 +1,8 @@
-import { useStripe } from '@stripe/stripe-react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useContext, useState } from 'react';
 import { ActivityIndicator, Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useStripe } from '../lib/stripe-provider';
 import { supabase } from '../lib/supabase';
 import { ThemeContext } from './_layout';
 

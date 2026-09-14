@@ -1,9 +1,9 @@
-import { StripeProvider } from '@stripe/stripe-react-native';
 import * as Notifications from 'expo-notifications';
 import { Tabs, useRouter, useSegments } from "expo-router";
 import { createContext, useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Text, View } from "react-native";
 import { registerForPushNotifications, savePushToken } from '../lib/notifications';
+import { StripeProvider } from '../lib/stripe-provider';
 import { supabase } from "../lib/supabase";
 
 export const ThemeContext = createContext({
