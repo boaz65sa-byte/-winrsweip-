@@ -4,43 +4,39 @@
 `WinrSwipe`
 
 ## Subtitle (iOS only — max 30 chars)
-`Swipe. Bid. Win.`
-(16 chars ✓)
+`Swipe through local deals`
+(25 chars ✓)
 
 ---
 
+The text to paste into App Store Connect is `app-store-listing.txt`. This file is the short internal copy of the same free-launch listing.
+
 ## Description — Hebrew
 
-WinrSwipe — מכרזים בסגנון Tinder.
+WinrSwipe הוא שוק מקומי. גוללים בין מודעות, מגישים הצעה, ומתאמים את המסירה עם המוכר בצ'אט.
 
-גלול ימינה על מה שאתה אוהב, הגש הצעה, וזכה. קנה ומכור פריטים יחידים עם מערכת נאמנות מובנית — הכסף מוחזק עד שאתה מאשר קבלה.
-
-✓ סווייפ על מכרזים בזמן אמת
-✓ הצעות מחיר + קנה עכשיו
-✓ Safe Trade — כסף בנאמנות עד קבלת הפריט
-✓ צ'אט ישיר עם המוכר לאחר עסקה
-✓ חיפוש לפי קטגוריה ומיקום GPS
-✓ מצב כהה/בהיר
+✓ סוויפ בין מודעות
+✓ הגשת הצעה
+✓ צ'אט עם המוכר
+✓ פרסום פריט
+✓ מחיקת חשבון ממסך הפרופיל
 
 ---
 
 ## Description — English
 
-WinrSwipe — Tinder-style auctions.
+WinrSwipe is a local marketplace. Swipe through listings, place a bid, and message the seller to arrange the handoff.
 
-Swipe right on what you love, place a bid, and win. Buy and sell unique items with built-in escrow — your money is held safely until you confirm receipt.
-
-✓ Swipe through live auctions in real time
-✓ Place bids or Buy It Now
-✓ Safe Trade — funds held in escrow until delivery confirmed
-✓ Direct chat with seller after a deal closes
-✓ Search by category and GPS location
-✓ Dark / Light mode
+✓ Swipe through listings
+✓ Place a bid
+✓ Chat with the seller
+✓ Publish an item
+✓ Delete your account from the profile screen
 
 ---
 
 ## Keywords (iOS — 100 chars max)
-`auction,bid,swipe,marketplace,escrow,buy,sell,secondhand,deals,winrswipe`
+`auction,bid,swipe,marketplace,buy,sell,secondhand,local,israel,winrswipe`
 (72 chars ✓ — 28 chars remaining for future additions)
 
 ## Google Play Tags
@@ -53,9 +49,10 @@ Shopping · Marketplace · Auction
 ---
 
 ## Privacy Policy URL
-Must be a live HTTPS URL before submission.
-Suggested: `https://winrswipe.com/privacy` or GitHub Pages.
-The content is already in `app/privacy.tsx`.
+https://winrsweip-boaz-s-projects-6bda35e8.vercel.app/privacy
+
+## Support URL
+https://winrsweip-boaz-s-projects-6bda35e8.vercel.app/support
 
 ---
 
@@ -69,7 +66,7 @@ The content is already in `app/privacy.tsx`.
 → Result: **4+**
 
 ### Android (Google Play)
-- Complete Financial Services declaration (app handles real-money transactions)
+- This version does not process payments. Do not declare in-app financial transactions.
 - No gambling declarations needed
 → Result: **Everyone**
 
@@ -78,11 +75,12 @@ The content is already in `app/privacy.tsx`.
 ## Screenshots Required
 
 ### iOS — iPhone 16 Pro Max (1320×2868)
-1. Swipe screen — main auction feed
-2. Search screen — category filters + GPS grid
-3. Listing detail — carousel, timer, bid history
-4. Payment screen — Safe Trade escrow breakdown
-5. Won screen — active purchases with status badges
+1. Home swipe card with a real listing
+2. Bid sheet (no fee line)
+3. Search grid
+4. Listing detail with a contact button
+5. Chat with a seller
+6. Profile, including Delete account
 
 ### Android — 1080×1920 minimum
 Same 5 screens, captured on Android emulator or device.

@@ -1,9 +1,10 @@
-import { StripeProvider } from '@stripe/stripe-react-native';
 import * as Notifications from 'expo-notifications';
-import { Tabs, useRouter } from "expo-router";
+import { Tabs, useRouter, useSegments } from "expo-router";
 import { createContext, useEffect, useRef, useState } from "react";
-import { Text } from "react-native";
+import { ActivityIndicator, Text, View } from "react-native";
+import { PAYMENTS_ENABLED } from '../lib/features';
 import { registerForPushNotifications, savePushToken } from '../lib/notifications';
+import { StripeProvider } from '../lib/stripe-provider';
 import { supabase } from "../lib/supabase";
 
 export const ThemeContext = createContext({
@@ -24,6 +25,8 @@ const ADMIN_EMAIL = 'boaz65sa@gmail.com';
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
+    shouldShowBanner: true,
+    shouldShowList: true,
     shouldPlaySound: true,
     shouldSetBadge: true,
   }),
@@ -34,20 +37,33 @@ export default function RootLayout() {
   const [user, setUser] = useState<any>(null);
   const [ready, setReady] = useState(false);
   const router = useRouter();
-  const notificationListener = useRef<Notifications.Subscription>();
-  const responseListener = useRef<Notifications.Subscription>();
+  const segments = useSegments();
+  const notificationListener = useRef<Notifications.Subscription | undefined>(undefined);
+  const responseListener = useRef<Notifications.Subscription | undefined>(undefined);
 
   useEffect(() => {
+    let cancelled = false;
+    const timeout = setTimeout(() => {
+      if (!cancelled) setReady(true);
+    }, 8000);
+
     supabase.auth.getSession().then(({ data: { session } }) => {
+      if (cancelled) return;
       setUser(session?.user ?? null);
       setReady(true);
+    }).catch(() => {
+      if (!cancelled) setReady(true);
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      cancelled = true;
+      clearTimeout(timeout);
+      subscription.unsubscribe();
+    };
   }, []);
 
   useEffect(() => {
@@ -63,7 +79,7 @@ export default function RootLayout() {
 
     responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
       const data = response.notification.request.content.data;
-      if (data?.screen) router.push(data.screen);
+      if (typeof data?.screen === 'string') router.push(data.screen as '/');
     });
 
     return () => {
@@ -74,8 +90,18 @@ export default function RootLayout() {
 
   useEffect(() => {
     if (!ready) return;
-    if (!user) router.replace('/login');
-  }, [ready, user]);
+    const onLogin = segments[0] === 'login';
+    if (!user && !onLogin) router.replace('/login');
+    else if (user && onLogin) router.replace('/');
+  }, [ready, user, segments, router]);
+
+  if (!ready) {
+    return (
+      <View style={{ flex: 1, backgroundColor: '#0D0D0D', alignItems: 'center', justifyContent: 'center' }}>
+        <ActivityIndicator color="#FF4D1C" size="large" />
+      </View>
+    );
+  }
 
   const isAdmin = user?.email === ADMIN_EMAIL;
 
@@ -92,8 +118,8 @@ export default function RootLayout() {
     isAdmin,
   };
 
-  return (
-    <StripeProvider publishableKey={process.env.EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY ?? ''}>
+  const stripeKey = PAYMENTS_ENABLED ? (process.env.EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY ?? '') : '';
+  const tree = (
     <ThemeContext.Provider value={theme}>
       <Tabs
         screenOptions={{
@@ -164,6 +190,8 @@ export default function RootLayout() {
         />
       </Tabs>
       </ThemeContext.Provider>
-      </StripeProvider>
   );
+
+  if (!stripeKey) return tree;
+  return <StripeProvider publishableKey={stripeKey}>{tree}</StripeProvider>;
 }

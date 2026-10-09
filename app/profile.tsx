@@ -2,6 +2,7 @@ import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useContext, useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, RefreshControl, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { PAYMENTS_ENABLED } from '../lib/features';
 import { supabase } from '../lib/supabase';
 import { ThemeContext } from './_layout';
 
@@ -20,6 +21,7 @@ export default function ProfileScreen() {
   const [city, setCity] = useState('');
   const [zipCode, setZipCode] = useState('');
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => { loadProfile(); }, []);
 
@@ -94,6 +96,35 @@ export default function ProfileScreen() {
     }
   };
 
+  const deleteAccount = () => {
+    Alert.alert(
+      'מחיקת חשבון',
+      'החשבון, המודעות, ההצעות וההודעות שלך יימחקו לצמיתות. לא ניתן לבטל.',
+      [
+        { text: 'ביטול', style: 'cancel' },
+        {
+          text: 'מחק לצמיתות',
+          style: 'destructive',
+          onPress: async () => {
+            setDeleting(true);
+            try {
+              const { data, error } = await supabase.functions.invoke('delete-account', { body: {} });
+              if (error || data?.error) {
+                throw new Error(data?.error || error?.message || 'המחיקה נכשלה');
+              }
+              await supabase.auth.signOut();
+              router.replace('/login');
+            } catch (e: any) {
+              Alert.alert('שגיאה', e.message || 'לא הצלחנו למחוק את החשבון. נסה/י שוב.');
+            } finally {
+              setDeleting(false);
+            }
+          },
+        },
+      ],
+    );
+  };
+
   const logout = async () => {
     Alert.alert('התנתקות', 'האם להתנתק?', [
       { text: 'ביטול', style: 'cancel' },
@@ -153,7 +184,7 @@ export default function ProfileScreen() {
       >
         <View style={s.headerPad} />
 
-        {!hasShipping && !editing && (
+        {PAYMENTS_ENABLED && !hasShipping && !editing && (
           <TouchableOpacity style={s.warningBox} onPress={() => setEditing(true)}>
             <Text style={s.warningText}>⚠️ חסרה כתובת למשלוח — הוסף כדי לזכות במכרזים</Text>
           </TouchableOpacity>
@@ -174,7 +205,7 @@ export default function ProfileScreen() {
                 <View style={[s.phonePrefix, { backgroundColor: theme.input, borderColor: theme.border }]}>
                   <Text style={{ color: theme.text, fontSize: 14 }}>🇮🇱 +972</Text>
                 </View>
-                <TextInput style={[s.phoneInput, { backgroundColor: theme.input, borderColor: theme.border, color: theme.text }]} value={phone} onChangeText={setPhone} placeholder="05X-XXXXXXX" placeholderTextColor={theme.sub} keyboardType="phone-pad" />
+                <TextInput style={[s.phoneInput, { backgroundColor: theme.input, borderColor: theme.border, color: theme.text }]} value={phone} onChangeText={setPhone} placeholder="Phone (optional) / 05X-XXXXXXX" placeholderTextColor={theme.sub} keyboardType="phone-pad" />
               </View>
               <Text style={[s.editSection, { color: theme.sub, marginTop: 8 }]}>כתובת למשלוח</Text>
               <TextInput style={[s.editInput, { backgroundColor: theme.input, borderColor: theme.border, color: theme.text }]} value={shippingAddress} onChangeText={setShippingAddress} placeholder="רחוב ומספר" placeholderTextColor={theme.sub} />
@@ -292,6 +323,12 @@ export default function ProfileScreen() {
           <Text style={s.logoutText}>התנתק</Text>
         </TouchableOpacity>
 
+        <TouchableOpacity style={s.deleteBtn} onPress={deleteAccount} disabled={deleting}>
+          {deleting
+            ? <ActivityIndicator color="#FF4D1C" />
+            : <Text style={s.deleteText}>מחק חשבון</Text>}
+        </TouchableOpacity>
+
         <View style={{ height: 40 }} />
       </ScrollView>
     </View>
@@ -346,8 +383,10 @@ const s = StyleSheet.create({
   legalSection: { borderRadius: 16, marginBottom: 12, borderWidth: 1, overflow: 'hidden' },
   legalRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 14 },
   legalText: { fontSize: 14, fontWeight: '500' },
-  logoutBtn: { backgroundColor: '#2A0A0A', borderRadius: 16, padding: 16, alignItems: 'center', marginBottom: 16 },
+  logoutBtn: { backgroundColor: '#2A0A0A', borderRadius: 16, padding: 16, alignItems: 'center', marginBottom: 12 },
   logoutText: { color: '#FF4D1C', fontWeight: '700', fontSize: 15 },
+  deleteBtn: { borderRadius: 16, padding: 16, alignItems: 'center', marginBottom: 16, borderWidth: 1, borderColor: '#5A2020' },
+  deleteText: { color: '#FF8A80', fontWeight: '700', fontSize: 15 },
 });
 
 // bs-simple.com | בועז סעדה - פתרונות יצירתיים

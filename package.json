@@ -8,7 +8,9 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "lint": "expo lint"
+    "lint": "expo lint",
+    "test": "node --test scripts/supabase-config.test.mjs",
+    "verify:auth": "node scripts/verify-app-review-auth.mjs"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
@@ -23,6 +25,7 @@
     "expo-av": "~16.0.8",
     "expo-camera": "~17.0.10",
     "expo-constants": "~18.0.13",
+    "expo-crypto": "~15.0.9",
     "expo-dev-client": "~6.0.20",
     "expo-device": "~8.0.10",
     "expo-font": "~14.0.11",

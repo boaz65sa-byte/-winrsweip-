@@ -5,7 +5,7 @@ const HE = [
   },
   {
     title: 'שאלות נפוצות',
-    body: 'איך יוצרים חשבון?\nניתן להירשם עם אימייל וסיסמה, עם חשבון Google, או עם Apple.\n\nמה קורה כשאני זוכה במכרז?\nתקבל התראה, ותוכל לשלם דרך האפליקציה. הכסף מוחזק בנאמנות (Escrow) עד שתאשר קבלת הפריט.\n\nאיך פותחים מחלוקת על עסקה?\nבמסך "הרכישות שלי", לחץ על "יש בעיה" בעסקה הרלוונטית וצוות התמיכה יצור איתך קשר.\n\nאיך מוחקים חשבון?\nשלח בקשה לאימייל למעלה ונמחק את החשבון והמידע הקשור אליו בהתאם למדיניות הפרטיות.',
+    body: 'איך יוצרים חשבון?\nניתן להירשם עם אימייל וסיסמה, עם חשבון Google, או עם Apple. מספר טלפון אינו חובה.\n\nאיך קונים או מוכרים?\nגוללים בין מודעות, מגישים הצעה, ומתאמים את המסירה עם הצד השני בצ\'אט שבאפליקציה.\n\nאיך מוחקים חשבון?\nבמסך הפרופיל לוחצים על "מחק חשבון" ומאשרים. החשבון, המודעות, ההצעות וההודעות נמחקים.',
   },
   {
     title: 'דיווח על תוכן פוגעני',
@@ -20,7 +20,7 @@ const EN = [
   },
   {
     title: 'Frequently Asked Questions',
-    body: 'How do I create an account?\nYou can sign up with email and password, with Google, or with Apple.\n\nWhat happens when I win an auction?\nYou\'ll get a notification and can pay in the app. Funds are held in escrow until you confirm receipt of the item.\n\nHow do I open a dispute about a transaction?\nOn the "My Purchases" screen, tap "There\'s a problem" on the relevant transaction and our support team will contact you.\n\nHow do I delete my account?\nSend a request to the email above and we will delete your account and associated data per our privacy policy.',
+    body: 'How do I create an account?\nSign up with email and password, Google, or Apple. A phone number is not required.\n\nHow do I buy or sell?\nSwipe through listings, place a bid, and arrange the handoff with the other person in the in-app chat.\n\nHow do I delete my account?\nOn the profile screen, tap Delete account and confirm. The account, listings, bids, and messages are deleted.',
   },
   {
     title: 'Reporting Abusive Content',
