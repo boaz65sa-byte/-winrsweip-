@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
@@ -45,6 +45,13 @@ test('free launch does not ship a Stripe publishable key', () => {
   assert.match(listing, /WinrSwipe/);
   assert.match(listing, /appreview@bs-simple.com/);
   assert.match(listing, /App Store Connect only/);
+});
+
+test('support site is the Next.js app in web/', () => {
+  const web = JSON.parse(readFileSync(join(root, 'web/vercel.json'), 'utf8'));
+  assert.equal(web.framework, 'nextjs');
+  assert.equal(web.outputDirectory, undefined);
+  assert.equal(existsSync(join(root, 'vercel.json')), false);
 });
 
 test('reviewer password is not written in the repo', () => {

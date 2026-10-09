@@ -1,14 +1,48 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { createBrowserClient } from '@supabase/ssr';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+function requiredEnv(name: string): string {
+  const value = process.env[name];
+  if (!value) throw new Error(`Missing ${name}`);
+  return value;
+}
 
-// Browser client with cookie-based auth (used in client components)
-export const supabase = createBrowserClient(supabaseUrl, supabaseAnonKey);
+let browserClient: ReturnType<typeof createBrowserClient> | undefined;
+function getBrowserClient() {
+  if (!browserClient) {
+    browserClient = createBrowserClient(
+      requiredEnv('NEXT_PUBLIC_SUPABASE_URL'),
+      requiredEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY'),
+    );
+  }
+  return browserClient;
+}
 
-// Admin client for server actions (service role — bypasses RLS)
-export const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey);
+let adminClient: SupabaseClient | undefined;
+function getAdminClient() {
+  if (!adminClient) {
+    adminClient = createClient(
+      requiredEnv('NEXT_PUBLIC_SUPABASE_URL'),
+      requiredEnv('SUPABASE_SERVICE_ROLE_KEY'),
+    );
+  }
+  return adminClient;
+}
 
-// bs-simple.com | בועז סעדה - פתרונות יצירתיים
+// Created on first use so `next build` can emit /support and /privacy
+// when Supabase env vars are not present at build time.
+export const supabase = new Proxy({} as ReturnType<typeof createBrowserClient>, {
+  get(_target, prop, receiver) {
+    const client = getBrowserClient();
+    const value = Reflect.get(client, prop, receiver);
+    return typeof value === 'function' ? value.bind(client) : value;
+  },
+});
+
+export const supabaseAdmin = new Proxy({} as SupabaseClient, {
+  get(_target, prop, receiver) {
+    const client = getAdminClient();
+    const value = Reflect.get(client, prop, receiver);
+    return typeof value === 'function' ? value.bind(client) : value;
+  },
+});
