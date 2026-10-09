@@ -37,7 +37,15 @@ App Review opens these URLs:
 - Support: https://winrsweip-boaz-s-projects-6bda35e8.vercel.app/support
 - Privacy: https://winrsweip-boaz-s-projects-6bda35e8.vercel.app/privacy
 
-The pages in `web/` match the free app (in-app deletion, no checkout). A push to `main` builds that Next.js app: the repo-root `vercel.json` runs `@vercel/next` on `web/package.json`. Both Vercel projects (`-winrsweip-` and `winrsweip`, team `boaz-s-projects-6bda35e8`) must keep Root Directory as the repository root so that file is used. If Root Directory is `web`, this root file is ignored and `web/vercel.json` (framework `nextjs`, no output directory) is the config instead.
+The pages in `web/` match the free app (in-app deletion, no checkout). Both Vercel projects on team `boaz-s-projects-6bda35e8` (`-winrsweip-` and `winrsweip`) must keep:
+
+- Settings → Build and Deployment → Framework Preset: **Next.js**
+- Settings → Build and Deployment → Root Directory: **web**
+- Output Directory: empty (do not set `.next`)
+
+A push to `main` then builds `web/`. Root Directory `.` deploys the Expo app and the production aliases return a platform 404. A nested `@vercel/next` build from the repo root also drops the static `/support` and `/privacy` pages.
+
+Supabase env vars on `-winrsweip-` are production-only (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`). Project `winrsweip` has none. `/support` and `/privacy` do not need them. The admin dashboard does.
 
 Do not publish production with a one-off `vercel --prod` from `web/` while Git is also connected. The next push to `main` replaces that alias.
 
