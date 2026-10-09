@@ -9,7 +9,7 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "lint": "expo lint",
-    "test": "node --test scripts/supabase-config.test.mjs",
+    "test": "node --test scripts/supabase-config.test.mjs scripts/demo-listings.test.mjs",
     "verify:auth": "node scripts/verify-app-review-auth.mjs"
   },
   "dependencies": {
