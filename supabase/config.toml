@@ -14,6 +14,12 @@ enabled = true
 verify_jwt = true
 entrypoint = "./functions/send-notification/index.ts"
 
+[functions.delete-account]
+enabled = true
+# Caller must be the signed-in user. The function deletes only that user.
+verify_jwt = true
+entrypoint = "./functions/delete-account/index.ts"
+
 [functions.stripe-webhook]
 enabled = true
 # Called by Stripe, not by a logged-in user — no Supabase JWT exists.

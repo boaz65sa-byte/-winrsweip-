@@ -151,7 +151,9 @@ const filtered = listings.filter(item => {
             <View style={[s.emptyBox, { backgroundColor: theme.card, borderColor: theme.border }]}>
               <Text style={s.emptyIcon}>🔍</Text>
               <Text style={[s.emptyTitle, { color: theme.text }]}>לא נמצאו תוצאות</Text>
-              <Text style={[s.emptySub, { color: theme.sub }]}>נסה חיפוש אחר או קטגוריה שונה</Text>
+              <Text style={[s.emptySub, { color: theme.sub }]}>
+                {locationMode === 'near' ? 'אין מודעות בעיר הזו. בחר/י כל הארץ למעלה.' : 'נסה חיפוש אחר או קטגוריה שונה'}
+              </Text>
             </View>
           ) : (
             <>

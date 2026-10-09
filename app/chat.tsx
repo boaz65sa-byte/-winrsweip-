@@ -108,7 +108,7 @@ export default function ChatScreen() {
       // התראה push לצד השני
       notifyUser(
         otherUserId,
-        `💬 הודעה חדשה מ-SwipeBid`,
+        `💬 הודעה חדשה ב-WinrSwipe`,
         `${trimmed.length > 50 ? trimmed.substring(0, 50) + '...' : trimmed}`,
         { screen: `/chat`, listingId, otherUserId: myId }
       );

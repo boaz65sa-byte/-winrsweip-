@@ -30,4 +30,27 @@ test('iOS explicitly enables Sign in with Apple', () => {
   const app = JSON.parse(readFileSync(join(root, 'app.json'), 'utf8'));
   assert.equal(app.expo.ios.usesAppleSignIn, true);
   assert.ok(app.expo.plugins.includes('expo-apple-authentication'));
+  assert.ok(Number(app.expo.ios.buildNumber) >= 25);
+});
+
+test('free launch does not ship a Stripe publishable key', () => {
+  const eas = JSON.parse(readFileSync(join(root, 'eas.json'), 'utf8'));
+  const features = readFileSync(join(root, 'lib/features.ts'), 'utf8');
+  assert.match(features, /export const PAYMENTS_ENABLED = false/);
+  for (const profile of ['development', 'preview', 'production']) {
+    assert.equal(eas.build[profile].env.EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY, undefined);
+  }
+  const listing = readFileSync(join(root, 'app-store-listing.txt'), 'utf8');
+  assert.doesNotMatch(listing, /Tinder|eBay|SwipeBid/);
+  assert.match(listing, /WinrSwipe/);
+  assert.match(listing, /appreview@bs-simple.com/);
+  assert.match(listing, /App Store Connect only/);
+});
+
+test('reviewer password is not written in the repo', () => {
+  const status = readFileSync(join(root, 'STATUS.md'), 'utf8');
+  assert.match(status, /not stored in this repo/i);
+  assert.doesNotMatch(status, /appreview@bs-simple\.com` \/ `/);
+  assert.match(readFileSync(join(root, 'app/profile.tsx'), 'utf8'), /delete-account/);
+  assert.ok(readFileSync(join(root, 'supabase/functions/delete-account/index.ts'), 'utf8').includes('deleteUser'));
 });

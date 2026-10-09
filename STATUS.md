@@ -1,6 +1,20 @@
-# SwipeBid (WinrSwipe) — Submission Status
+# WinrSwipe — Submission Status
 
-**Last updated:** 2026-09-14
+**Last updated:** 2026-10-09
+
+## 2026-10-09 — free launch for the next iOS review
+
+In-app checkout is off (`lib/features.ts`). No Stripe publishable key is in `eas.json`.
+Account deletion is on the profile screen and calls the `delete-account` Edge Function.
+The feed is readable after sign-in (RLS policies + live listings). Sign in with Apple
+still needs the Supabase Apple provider enabled. Do not submit until the checklist in
+`docs/app-review-owner-steps.md` is done. The next production EAS binary will be build 26.
+
+The notes below are the history of earlier rejections.
+
+---
+
+**Previous update:** 2026-09-14
 
 ## 2026-09-14 — App Review 2.1(a) sign-in failure (root cause)
 
@@ -17,9 +31,9 @@ Two other historic projects are also dead: `qxpueymbeawmlroknjwe`, `msozsfuogkxt
 **Live backend:** `https://xkydgfjiofsdqsbozuha.supabase.co` (email provider on,
 `mailer_autoconfirm` on, listings readable). Demo reviewer account created there.
 
-**App Review sign-in (also enter this in App Store Connect → App Review Information):**
-email `appreview@bs-simple.com` — password is the existing demo password already
-recorded in this file below (do not add new copies of it).
+**App Review sign-in (enter this in App Store Connect → App Review Information):**
+email `appreview@bs-simple.com`. The password is stored only in App Store Connect,
+not in this repository.
 
 **Still required in the Supabase dashboard (cannot be done from the client):**
 Authentication → Providers → **Apple → Enable**, Client IDs: `com.winrswipe.app`.
@@ -37,7 +51,7 @@ that still mention `onmcbwieonuazwlsxhor` (dashboard env overrides `eas.json`).
 ---
 
 ## What this project is
-Expo/React Native marketplace app — "Tinder-style auctions" for Israel. Stripe payments (escrow),
+Expo/React Native marketplace app for Israel. Free launch has no in-app checkout.
 Supabase backend, admin web dashboard (`web/`). Package/bundle managed via EAS.
 
 ## Where things stood before this pass
@@ -62,7 +76,7 @@ Supabase backend, admin web dashboard (`web/`). Package/bundle managed via EAS.
        (project was paused on the free tier, not deleted — restored it), wired into all three
        `eas.json` build profiles, committed
 3. [x] Demo/reviewer account created and verified working end-to-end:
-       `appreview@bs-simple.com` / `Boaz6565` (had to also flip Email provider on in
+       `appreview@bs-simple.com` (password is not stored in this repo; had to also flip Email provider on in
        Supabase Auth settings — it was disabled project-wide). Confirmed via a direct
        `POST /auth/v1/token?grant_type=password` call, got a real access token back.
    - [ ] Still needs to be entered into App Store Connect → Sign-In Information (user action,

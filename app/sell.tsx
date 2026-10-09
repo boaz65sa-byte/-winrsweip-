@@ -6,6 +6,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useContext, useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Alert, Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { PAYMENTS_ENABLED } from '../lib/features';
 import { supabase } from '../lib/supabase';
 import { ThemeContext } from './_layout';
 
@@ -203,7 +204,7 @@ export default function SellScreen() {
         buy_now_price: buyNowPrice ? Number(buyNowPrice) : null,
         duration_hours: duration,
         listing_type: listingType,
-        status: 'pending',
+        status: PAYMENTS_ENABLED ? 'pending' : 'active',
         ends_at: new Date(Date.now() + duration * 3600000).toISOString(),
         images,
         video_url: videoUri,
@@ -212,13 +213,16 @@ export default function SellScreen() {
       if (isEdit && listingId) {
         const { error } = await supabase.from('listings').update(payload).eq('id', listingId);
         if (error) throw error;
-        Alert.alert('עודכן! ✓', 'הפרסום נשלח מחדש לאישור מנהל', [
+        Alert.alert('עודכן! ✓', PAYMENTS_ENABLED ? 'הפרסום נשלח מחדש לאישור מנהל' : 'המודעה עודכנה ומוצגת בפיד', [
           { text: 'אישור', onPress: () => router.back() }
         ]);
       } else {
         const { error } = await supabase.from('listings').insert({ ...payload, seller_id: user.id });
         if (error) throw error;
-        Alert.alert('נשלח לאישור! ✓', 'הפריט ממתין לאישור מנהל');
+        Alert.alert(
+          PAYMENTS_ENABLED ? 'נשלח לאישור! ✓' : 'המודעה באוויר! ✓',
+          PAYMENTS_ENABLED ? 'הפריט ממתין לאישור מנהל' : 'קונים יכולים לראות את הפריט וליצור איתך קשר בצ\'אט.',
+        );
         setTitle(''); setCategory(''); setCondition(''); setCity('');
         setStartingPrice(''); setReservePrice(''); setBuyNowPrice('');
         setImages([]); setVideoUri(null); setListingType('both');
@@ -414,7 +418,11 @@ export default function SellScreen() {
 
         <View style={[s.escrowBox, { backgroundColor: theme.dark ? '#0A1F0A' : '#E8F5E9' }]}>
           <Text style={s.escrowIcon}>🔒</Text>
-          <Text style={[s.escrowText, { color: '#4CAF50' }]}>הכסף מוחזק בנאמנות — תקבל 90% מהמחיר הסופי לאחר אישור הקונה.</Text>
+          <Text style={[s.escrowText, { color: '#4CAF50' }]}>
+            {PAYMENTS_ENABLED
+              ? 'הכסף מוחזק בנאמנות — תקבל 90% מהמחיר הסופי לאחר אישור הקונה.'
+              : 'המודעה עולה מיד. קונים יוכלו ליצור איתך קשר בצ\'אט כדי לתאם.'}
+          </Text>
         </View>
 
         <TouchableOpacity style={[s.publishBtn, loading && s.publishBtnDisabled]} onPress={publish} disabled={loading}>

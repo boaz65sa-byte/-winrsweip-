@@ -2,10 +2,131 @@ import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useContext, useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { startSellerChat } from '../lib/contact';
+import { PAYMENTS_ENABLED } from '../lib/features';
 import { supabase } from '../lib/supabase';
 import { ThemeContext } from './_layout';
 
-export default function WonScreen() {
+type Deal = {
+  key: string;
+  listingId: string;
+  title: string;
+  amount: number | null;
+  sellerId: string | null;
+};
+
+function WonDeals() {
+  const theme = useContext(ThemeContext);
+  const router = useRouter();
+  const [deals, setDeals] = useState<Deal[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => { load(); }, []);
+
+  const load = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const byListing = new Map<string, Deal>();
+      const { data: bids } = await supabase
+        .from('bids')
+        .select('id, amount, listing_id, listings(id, title, seller_id)')
+        .eq('bidder_id', user.id)
+        .order('amount', { ascending: false });
+
+      for (const bid of bids ?? []) {
+        const listing = bid.listings as { id?: string; title?: string; seller_id?: string } | null;
+        const listingId = bid.listing_id as string;
+        if (!listingId || byListing.has(listingId)) continue;
+        byListing.set(listingId, {
+          key: bid.id,
+          listingId,
+          title: listing?.title || 'פריט',
+          amount: bid.amount,
+          sellerId: listing?.seller_id ?? null,
+        });
+      }
+
+      const { data: messages } = await supabase
+        .from('messages')
+        .select('id, listing_id, listings(id, title, seller_id)')
+        .or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`)
+        .order('created_at', { ascending: false });
+
+      for (const message of messages ?? []) {
+        const listing = message.listings as { id?: string; title?: string; seller_id?: string } | null;
+        const listingId = message.listing_id as string;
+        if (!listingId || byListing.has(listingId)) continue;
+        if (listing?.seller_id === user.id) continue;
+        byListing.set(listingId, {
+          key: message.id,
+          listingId,
+          title: listing?.title || 'פריט',
+          amount: null,
+          sellerId: listing?.seller_id ?? null,
+        });
+      }
+
+      setDeals([...byListing.values()]);
+    } catch (e) {
+      console.log('won load', e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <View style={[s.root, { backgroundColor: theme.bg, alignItems: 'center', justifyContent: 'center' }]}>
+        <ActivityIndicator color="#FF4D1C" size="large" />
+      </View>
+    );
+  }
+
+  return (
+    <View style={[s.root, { backgroundColor: theme.bg }]}>
+      <StatusBar style={theme.dark ? 'light' : 'dark'} />
+      <View style={s.header}>
+        <Text style={[s.title, { color: theme.text }]}>ההצעות שלי</Text>
+        <Text style={[s.sub, { color: theme.sub }]}>הצעות ושיחות עם מוכרים</Text>
+      </View>
+      <ScrollView style={s.scroll} showsVerticalScrollIndicator={false}>
+        {deals.length === 0 && (
+          <View style={[s.emptyBox, { backgroundColor: theme.card, borderColor: theme.border }]}>
+            <Text style={s.emptyIcon}>🏆</Text>
+            <Text style={[s.emptyTitle, { color: theme.text }]}>עדיין אין הצעות</Text>
+            <Text style={[s.emptySub, { color: theme.sub }]}>סוויפ על מכרז, הגש הצעה, או פתח צ'אט עם המוכר.</Text>
+          </View>
+        )}
+        {deals.map((deal) => (
+          <View key={deal.key} style={[s.card, { backgroundColor: theme.card, borderColor: theme.border }]}>
+            <Text style={[s.cardTitle2, { color: theme.text }]} numberOfLines={1}>{deal.title}</Text>
+            {deal.amount != null && (
+              <Text style={[s.priceVal, { color: '#FF4D1C', marginTop: 6 }]}>ההצעה שלך: ₪{deal.amount}</Text>
+            )}
+            {deal.sellerId && (
+              <TouchableOpacity
+                style={[s.chatBtn, { borderColor: theme.border, backgroundColor: theme.card, marginTop: 12 }]}
+                onPress={() => startSellerChat(router, {
+                  id: deal.listingId,
+                  title: deal.title,
+                  seller_id: deal.sellerId,
+                }, { sendOpener: false })}
+              >
+                <Text style={s.chatBtnIcon}>💬</Text>
+                <Text style={[s.chatBtnText, { color: theme.text }]}>צ'אט עם המוכר</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+        ))}
+        <View style={{ height: 40 }} />
+      </ScrollView>
+    </View>
+  );
+}
+
+function WonPaid() {
   const theme = useContext(ThemeContext);
   const router = useRouter();
   const [wonItems, setWonItems] = useState<any[]>([]);
@@ -74,7 +195,7 @@ export default function WonScreen() {
               .from('escrow_transactions')
               .update({ status: 'dispute' })
               .eq('id', transactionId);
-            Alert.alert('מחלוקת נפתחה', 'הכסף יישאר קפוא עד לפתרון. צוות SwipeBid יצור איתך קשר.');
+            Alert.alert('מחלוקת נפתחה', 'הכסף יישאר קפוא עד לפתרון. צוות WinrSwipe יצור איתך קשר.');
             loadWonItems();
           }
         },
@@ -85,7 +206,7 @@ export default function WonScreen() {
               .from('escrow_transactions')
               .update({ status: 'dispute' })
               .eq('id', transactionId);
-            Alert.alert('מחלוקת נפתחה', 'הכסף יישאר קפוא עד לפתרון. צוות SwipeBid יצור איתך קשר.');
+            Alert.alert('מחלוקת נפתחה', 'הכסף יישאר קפוא עד לפתרון. צוות WinrSwipe יצור איתך קשר.');
             loadWonItems();
           }
         }
@@ -256,6 +377,11 @@ export default function WonScreen() {
       </ScrollView>
     </View>
   );
+}
+
+export default function WonScreen() {
+  if (!PAYMENTS_ENABLED) return <WonDeals />;
+  return <WonPaid />;
 }
 
 const s = StyleSheet.create({

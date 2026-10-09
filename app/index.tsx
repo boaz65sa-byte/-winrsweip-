@@ -1,26 +1,23 @@
 import { Ionicons } from '@expo/vector-icons';
+import * as Location from 'expo-location';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useContext, useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, Dimensions, Image, KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { Gesture, GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
 import Animated, { runOnJS, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
-import * as Location from 'expo-location';
+import { startSellerChat } from '../lib/contact';
+import { PAYMENTS_ENABLED } from '../lib/features';
 import { notifyUser } from '../lib/notifications';
 import { supabase } from '../lib/supabase';
 import { ThemeContext } from './_layout';
 
 const { width } = Dimensions.get('window');
 
-const FALLBACK = [
-  { id: '1', emoji: '🧥', title: "Vintage Leather Jacket", category: "אופנה", condition: "טוב", current_bid: 150, buy_now_price: 300, starting_price: 100, listing_type: 'both', images: [], ends_at: new Date(Date.now() + 24 * 3600000).toISOString() },
-  { id: '2', emoji: '📸', title: "Nikon FM2 וינטג'", category: "מצלמות", condition: "כמו חדש", current_bid: 480, buy_now_price: 900, starting_price: 400, listing_type: 'auction', images: [], ends_at: new Date(Date.now() + 12 * 3600000).toISOString() },
-];
-
 export default function App() {
   const theme = useContext(ThemeContext);
   const router = useRouter();
-  const [products, setProducts] = useState<any[]>(FALLBACK);
+  const [products, setProducts] = useState<any[]>([]);
   const [showBid, setShowBid] = useState(false);
   const [bidAmount, setBidAmount] = useState('');
   const [loading, setLoading] = useState(true);
@@ -28,13 +25,11 @@ export default function App() {
   const [timeLeft, setTimeLeft] = useState<{[key: string]: string}>({});
   const [cityFilter, setCityFilter] = useState<string | null>(null); // null = כל הארץ
   const [userCity, setUserCity] = useState<string | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [sawListings, setSawListings] = useState(false);
   const translateX = useSharedValue(0);
   const translateY = useSharedValue(0);
 
-  useEffect(() => {
-    if (!theme.user) return;
-    detectCity();
-  }, [theme.user]);
   useEffect(() => { loadListings(); }, [cityFilter]);
 
   useEffect(() => {
@@ -64,12 +59,11 @@ export default function App() {
       const [address] = await Location.reverseGeocodeAsync(loc.coords);
       if (address?.city) {
         setUserCity(address.city);
-        // Keep the default "all listings" filter. Auto-switching to the
-        // reviewer's local city (e.g. Cupertino) would hide every Israeli
-        // auction and look like a broken post-login state.
+        setCityFilter(address.city);
+        setLoading(true);
       }
-    } catch (e) {
-      // no location — show all
+    } catch {
+      Alert.alert('מיקום', 'לא הצלחנו לקבל מיקום. מציגים את כל המודעות.');
     }
   };
 
@@ -83,37 +77,54 @@ export default function App() {
 
       if (cityFilter) q = q.eq('city', cityFilter);
 
-      const { data } = await q;
-      if (data && data.length > 0) {
-        setProducts(data.map(item => ({ ...item, emoji: '🛍️', bids: 0, watchers: 0 })));
-      } else {
+      const { data, error } = await q;
+      if (error) {
+        setLoadError('לא הצלחנו לטעון מכרזים. נסה/י לרענן.');
         setProducts([]);
+        return;
       }
-    } catch (e) {
-      console.log('fallback');
+      setLoadError(null);
+      const rows = data ?? [];
+      if (rows.length > 0) setSawListings(true);
+      setProducts(rows.map(item => ({ ...item, emoji: '🛍️', bids: 0, watchers: 0 })));
+    } catch {
+      setLoadError('לא הצלחנו לטעון מכרזים. נסה/י לרענן.');
+      setProducts([]);
     } finally {
       setLoading(false);
     }
   };
 
   const buyNow = async (product: any) => {
+    if (PAYMENTS_ENABLED) {
+      Alert.alert(
+        'קנה עכשיו',
+        `לקנות את "${product.title}" ב-₪${product.buy_now_price}?`,
+        [
+          { text: 'ביטול', style: 'cancel' },
+          {
+            text: `המשך ₪${product.buy_now_price} ←`,
+            onPress: () => router.push({
+              pathname: '/payment',
+              params: {
+                listingId: product.id,
+                amount: String(product.buy_now_price),
+                title: product.title,
+                sellerId: product.seller_id ?? '',
+              },
+            }),
+          },
+        ],
+      );
+      return;
+    }
     Alert.alert(
-      'קנה עכשיו',
-      `לקנות את "${product.title}" ב-₪${product.buy_now_price}?`,
+      'יצירת קשר',
+      `לתאם עם המוכר לגבי "${product.title}"?`,
       [
         { text: 'ביטול', style: 'cancel' },
-        {
-          text: `שלם ₪${product.buy_now_price} ←`,
-          onPress: () => router.push({
-            pathname: '/payment',
-            params: {
-              listingId: product.id,
-              amount: product.buy_now_price,
-              title: product.title,
-            }
-          })
-        }
-      ]
+        { text: 'פתח צ\'אט', onPress: () => startSellerChat(router, product) },
+      ],
     );
   };
 
@@ -145,8 +156,6 @@ export default function App() {
         .limit(1)
         .single();
 
-      const safeTradeFee = Math.round(amount * 0.02);
-
       const { error: bidError } = await supabase.from('bids').insert({ listing_id: product.id, bidder_id: user.id, amount });
       if (bidError) throw new Error(bidError.message);
 
@@ -176,9 +185,19 @@ export default function App() {
           match_buyer_id: user.id,
           match_amount: amount,
         }).eq('id', product.id);
-        Alert.alert('🎯 Match!', `הצעתך של ₪${amount} עברה את מחיר הרזרבה! המוכר קיבל התראה לאישור.`);
-      } else {
+        Alert.alert('🎯 Match!', `הצעתך של ₪${amount} עברה את מחיר הרזרבה! המוכר קיבל התראה.`);
+      } else if (PAYMENTS_ENABLED) {
+        const safeTradeFee = Math.round(amount * 0.02);
         Alert.alert('הצעה הוגשה! ✓', `הגשת ₪${amount} + ₪${safeTradeFee} Safe Trade Fee`);
+      } else {
+        Alert.alert(
+          'הצעה הוגשה! ✓',
+          `ההצעה של ₪${amount} נשמרה. אפשר לתאם עם המוכר בצ'אט.`,
+          [
+            { text: 'סגור', style: 'cancel' },
+            { text: 'פתח צ\'אט', onPress: () => startSellerChat(router, product) },
+          ],
+        );
       }
 
       setShowBid(false);
@@ -225,14 +244,36 @@ export default function App() {
   }
 
   if (products.length === 0) {
+    const title = loadError
+      ? 'לא הצלחנו לטעון'
+      : cityFilter
+        ? 'אין מודעות בעיר הזו'
+        : sawListings
+          ? 'ראית הכל!'
+          : 'אין מכרזים פעילים כרגע';
+    const subtitle = loadError
+      ? loadError
+      : cityFilter
+        ? 'חזור לכל הארץ כדי לראות את המודעות.'
+        : sawListings
+          ? 'אין עוד מכרזים ברשימה הזו'
+          : 'אפשר לפרסם פריט, או לרענן עוד רגע.';
     return (
-      <View style={[s.root, { backgroundColor: theme.bg, alignItems: 'center', justifyContent: 'center', gap: 16 }]}>
+      <View style={[s.root, { backgroundColor: theme.bg, alignItems: 'center', justifyContent: 'center', gap: 16, paddingHorizontal: 24 }]}>
         <StatusBar style={theme.dark ? 'light' : 'dark'} />
-        <Text style={{ fontSize: 64 }}>🎉</Text>
-        <Text style={{ color: theme.text, fontSize: 20, fontWeight: '900' }}>ראית הכל!</Text>
-        <Text style={{ color: theme.sub, fontSize: 14 }}>אין עוד מכרזים כרגע</Text>
+        <Text style={{ fontSize: 64 }}>{loadError ? '⚡' : '🎉'}</Text>
+        <Text style={{ color: theme.text, fontSize: 20, fontWeight: '900', textAlign: 'center' }}>{title}</Text>
+        <Text style={{ color: theme.sub, fontSize: 14, textAlign: 'center' }}>{subtitle}</Text>
+        {cityFilter && (
+          <TouchableOpacity
+            style={{ backgroundColor: '#FF4D1C', borderRadius: 16, paddingHorizontal: 28, paddingVertical: 14 }}
+            onPress={() => { setCityFilter(null); setLoading(true); }}
+          >
+            <Text style={{ color: '#fff', fontWeight: '800', fontSize: 15 }}>כל הארץ</Text>
+          </TouchableOpacity>
+        )}
         <TouchableOpacity
-          style={{ marginTop: 8, backgroundColor: '#FF4D1C', borderRadius: 16, paddingHorizontal: 28, paddingVertical: 14 }}
+          style={{ marginTop: 8, backgroundColor: cityFilter ? theme.card : '#FF4D1C', borderRadius: 16, paddingHorizontal: 28, paddingVertical: 14 }}
           onPress={() => { setLoading(true); loadListings(); }}
         >
           <Text style={{ color: '#fff', fontWeight: '800', fontSize: 15 }}>רענן</Text>
@@ -265,14 +306,17 @@ export default function App() {
         >
           <Text style={{ color: cityFilter === null ? '#fff' : theme.sub, fontSize: 12, fontWeight: '700' }}>🌍 כל הארץ</Text>
         </TouchableOpacity>
-        {userCity && (
-          <TouchableOpacity
-            style={[s.iconBtn, { backgroundColor: cityFilter === userCity ? '#FF4D1C' : theme.card, borderColor: cityFilter === userCity ? '#FF4D1C' : theme.border, flex: 1, borderRadius: 20, height: 36 }]}
-            onPress={() => { setCityFilter(userCity); setLoading(true); }}
-          >
-            <Text style={{ color: cityFilter === userCity ? '#fff' : theme.sub, fontSize: 12, fontWeight: '700' }}>📍 {userCity}</Text>
-          </TouchableOpacity>
-        )}
+        <TouchableOpacity
+          style={[s.iconBtn, { backgroundColor: cityFilter && cityFilter === userCity ? '#FF4D1C' : theme.card, borderColor: cityFilter && cityFilter === userCity ? '#FF4D1C' : theme.border, flex: 1, borderRadius: 20, height: 36 }]}
+          onPress={() => {
+            if (userCity) { setCityFilter(userCity); setLoading(true); }
+            else detectCity();
+          }}
+        >
+          <Text style={{ color: cityFilter && cityFilter === userCity ? '#fff' : theme.sub, fontSize: 12, fontWeight: '700' }}>
+            📍 {userCity && cityFilter === userCity ? userCity : 'קרוב אליי'}
+          </Text>
+        </TouchableOpacity>
       </View>
 
       <GestureDetector gesture={gesture}>
@@ -301,7 +345,9 @@ export default function App() {
               </View>
               {product.buy_now_price && (
                 <TouchableOpacity style={s.buyNowBtn} onPress={() => buyNow(product)}>
-                  <Text style={s.buyNowText}>קנה עכשיו ₪{product.buy_now_price}</Text>
+                  <Text style={s.buyNowText}>
+                    {PAYMENTS_ENABLED ? `קנה עכשיו ₪${product.buy_now_price}` : `צור קשר · ₪${product.buy_now_price}`}
+                  </Text>
                 </TouchableOpacity>
               )}
             </View>
@@ -335,9 +381,11 @@ export default function App() {
               <Text style={[s.currency, { color: theme.sub }]}>₪</Text>
               <TextInput style={[s.bidInput, { color: theme.text }]} value={bidAmount} onChangeText={setBidAmount} keyboardType="numeric" autoFocus />
             </View>
-            <View style={s.feeBox}>
-              <Text style={s.feeText}>Safe Trade Fee (2%): +₪{Math.round(Number(bidAmount) * 0.02) || 0}</Text>
-            </View>
+            {PAYMENTS_ENABLED && (
+              <View style={s.feeBox}>
+                <Text style={s.feeText}>Safe Trade Fee (2%): +₪{Math.round(Number(bidAmount) * 0.02) || 0}</Text>
+              </View>
+            )}
             <View style={s.modalBtns}>
               <TouchableOpacity style={[s.cancelBtn, { backgroundColor: theme.input, borderColor: theme.border }]} onPress={() => setShowBid(false)}>
                 <Text style={[s.cancelText, { color: theme.text }]}>ביטול</Text>

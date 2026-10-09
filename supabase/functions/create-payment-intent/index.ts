@@ -7,6 +7,7 @@ const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '
 
 const SAFE_TRADE_FEE_RATE = 0.02;
 const PLATFORM_FEE_RATE = 0.10;
+const PAYMENTS_ENABLED = Deno.env.get('PAYMENTS_ENABLED') === 'true';
 
 Deno.serve(async (req) => {
   const corsHeaders = {
@@ -19,6 +20,13 @@ Deno.serve(async (req) => {
   }
 
   try {
+    if (!PAYMENTS_ENABLED) {
+      return new Response(
+        JSON.stringify({ error: 'In-app payments are turned off' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 403 }
+      );
+    }
+
     if (!STRIPE_SECRET_KEY) {
       throw new Error('STRIPE_SECRET_KEY לא מוגדר ב-Supabase Secrets');
     }

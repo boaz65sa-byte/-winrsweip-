@@ -1,127 +1,102 @@
 =====================================
-SWIPEBID — APP STORE LISTING
+WINRSWIPE — APP STORE LISTING
 =====================================
 
---- APP NAME ---
-SwipeBid – Swipe & Bid
+Paste these fields into App Store Connect. Do not put the reviewer password in this file or in the review notes.
 
---- SUBTITLE (30 chars max) ---
-Tinder-Style Auctions in Israel
+--- NAME (30 characters max) ---
+WinrSwipe
+
+--- SUBTITLE (30 characters max) ---
+Swipe through local deals
+(25 characters)
 
 --- CATEGORY ---
 Primary: Shopping
-Secondary: Finance
+Secondary: none
 
---- KEYWORDS (100 chars max) ---
-auction,bid,swipe,sell,buy,מכרז,מכרזים,קנה,מכור,eBay,marketplace,Israel
+--- KEYWORDS (100 characters max, comma-separated, no spaces) ---
+auction,bid,swipe,marketplace,buy,sell,secondhand,local,israel,winrswipe
+(72 characters)
 
-===========================
-DESCRIPTION — ENGLISH
-===========================
-SwipeBid is the first Tinder-style auction app for Israel.
-Swipe through unique items, place bids, and win deals — all in seconds.
+--- PROMOTIONAL TEXT (170 characters max, optional) ---
+Swipe through listings near you, place a bid, and arrange the handoff in chat. Free to join.
 
-🔥 HOW IT WORKS
-• Swipe right to save an item, left to skip
-• Tap the bid button to place your offer
-• Win the auction before the timer runs out
-• Pay securely with Stripe — money held in escrow until you confirm delivery
+--- DESCRIPTION ---
+WinrSwipe is a local marketplace for Israel. Swipe through listings, place a bid, and message the seller to arrange the handoff.
 
-🛡️ SAFE TRADE PROTECTION
-Every transaction is protected by our Escrow system.
-Your money is held securely and only released to the seller after you confirm receipt of the item.
+HOW IT WORKS
+• Swipe through live listings
+• Place a bid, or open a listing to message the seller
+• Publish an item with photos from the Publish tab
+• Chat inside the app to agree on the handoff
 
-💰 SELL IN MINUTES
-• Take photos or upload from your gallery
-• Set a starting price, reserve price, and Buy It Now option
-• Your listing goes live immediately after admin approval
+ACCOUNT
+• Sign in with email and password, or with Sign in with Apple
+• Phone number is optional
+• Delete your account anytime from the Profile tab
 
-🔔 NEVER MISS A BID
-Real-time push notifications when:
-• Someone outbids you
-• Your auction ends
-• You win an item
+WinrSwipe is free to use.
 
-📍 FIND LOCAL DEALS
-Filter auctions by location and find items near you.
+Terms of Use and Privacy Policy are available in the app and on the web.
 
-💬 BUILT-IN CHAT
-Coordinate shipping directly with the seller through our secure in-app chat — only available after a deal is closed.
+--- DESCRIPTION (HEBREW, optional) ---
+WinrSwipe הוא שוק מקומי. גוללים בין מודעות, מגישים הצעה, ומתאמים את המסירה עם המוכר בצ'אט.
 
-SwipeBid charges a 2% Safe Trade Fee per transaction for buyer protection, and a 10% platform fee for sellers.
+• סוויפ בין מודעות
+• הגשת הצעה או פתיחת צ'אט עם המוכר
+• פרסום פריט עם תמונות
+• מחיקת חשבון ממסך הפרופיל
 
-Terms of Use and Privacy Policy available in the app.
+השימוש באפליקציה חופשי.
 
-===========================
-DESCRIPTION — HEBREW (עברית)
-===========================
-SwipeBid — מכרז בסגנון Tinder לישראל.
-סוויפ על פריטים ייחודיים, הגש הצעות וזכה בעסקאות — הכל בשניות.
+--- SUPPORT URL ---
+https://winrsweip-boaz-s-projects-6bda35e8.vercel.app/support
 
-🔥 איך זה עובד
-• סוויפ ימינה לשמירת פריט, שמאלה לדילוג
-• לחץ על כפתור ההצעה לביצוע הצעת מחיר
-• זכה במכרז לפני פקיעת הטיימר
-• שלם בבטחה עם Stripe — הכסף מוחזק בנאמנות עד לאישורך
+--- PRIVACY POLICY URL ---
+https://winrsweip-boaz-s-projects-6bda35e8.vercel.app/privacy
 
-🛡️ הגנת Safe Trade
-כל עסקה מוגנת במערכת Escrow שלנו.
-הכסף מוחזק בבטחה ומשוחרר למוכר רק לאחר שתאשר קבלת הפריט.
+--- MARKETING URL (optional) ---
+https://winrsweip-boaz-s-projects-6bda35e8.vercel.app/support
 
-💰 פרסם תוך דקות
-• צלם תמונות או העלה מהגלריה
-• קבע מחיר פתיחה, מחיר רזרבה ואפשרות "קנה עכשיו"
-• המודעה עולה לאוויר מיד לאחר אישור מנהל
+--- COPYRIGHT ---
+2026 Boaz Saada
 
-🔔 אל תפספס הצעה
-התראות Push בזמן אמת כאשר:
-• עקפו את הצעתך
-• המכרז שלך הסתיים
-• זכית בפריט
+--- AGE RATING (questionnaire) ---
+Answer No to gambling, contests, unrestricted web access, and in-app purchases.
+User-generated content: Yes (listings and chat).
+Expected rating: 12+ or the rating App Store Connect assigns for user-generated content.
+This version does not offer in-app purchases.
 
-📍 מצא עסקאות קרובות
-סנן מכרזים לפי מיקום ומצא פריטים בסביבתך.
+--- APP REVIEW INFORMATION ---
+Sign-in required: Yes
+Demo account email: appreview@bs-simple.com
+Demo account password: <enter the existing reviewer password in App Store Connect only>
 
-💬 צ'אט מובנה
-תאם משלוח עם המוכר ישירות דרך הצ'אט המאובטח — זמין רק לאחר סגירת עסקה.
+Contact: Boaz Saada
+Email: boaz65sa@gmail.com
+Phone: use the number already on the Apple Developer account
 
-SwipeBid גובה 2% Safe Trade Fee לעסקה להגנת הקונה, ו-10% עמלת פלטפורמה מהמוכר.
+Notes (English, paste into App Review Information → Notes):
 
-=====================================
-SCREENSHOTS — WHAT TO CAPTURE
-(iPhone 6.5" = iPhone 14 Pro Max)
-=====================================
+This build is the free WinrSwipe marketplace. There is no checkout and no in-app purchase.
 
-Screenshot 1: מסך הסוויפ הראשי עם כרטיס מוצר יפה
-Screenshot 2: מודל הגשת הצעה פתוח
-Screenshot 3: מסך חיפוש עם גריד מוצרים
-Screenshot 4: מסך פרטי מוצר (listing) עם Carousel
-Screenshot 5: מסך הרכישות שלי (won) עם Escrow badge
-Screenshot 6: מסך צ'אט עם הודעות
+1. Sign in with the demo email and password on this page, or with Sign in with Apple.
+2. After sign-in the home feed lists active items. The default filter is all of Israel. Do not expect the feed to filter to the review device's city.
+3. Swipe a card, place a bid, or open a listing and tap the contact button to message the seller in chat.
+4. The Publish tab creates a listing that appears in the feed immediately.
+5. Account deletion: Profile tab → Delete account → confirm. This permanently deletes that account on the server and signs out. Please use a throwaway account if you test deletion; the demo account above should stay available for sign-in.
 
-Tip: צלם על iPhone אמיתי עם Dark Mode פעיל — נראה הכי טוב.
+Phone number on registration is optional. Location permission is requested only if the reviewer taps the nearby filter.
 
-=====================================
-PRIVACY POLICY URL
-=====================================
-https://bs-simple.com/swipebid/privacy
-(צריך להעלות את דף הפרייבסי לאתר לפני הגשה)
+--- SCREENSHOTS ---
+Capture on a device in dark mode, after signing in, with real listings visible:
+1. Home swipe card
+2. Bid sheet (no fee line)
+3. Search grid
+4. Listing detail with a contact button
+5. Chat with a seller
+6. Profile, including Delete account
 
-=====================================
-SUPPORT URL
-=====================================
-https://bs-simple.com/swipebid
-
-=====================================
-MARKETING URL (optional)
-=====================================
-https://bs-simple.com/swipebid
-
-=====================================
-AGE RATING
-=====================================
-17+ (Unrestricted Web Access, Financial Info)
-
-=====================================
-bs-simple.com | בועז סעדה - פתרונות יצירתיים
+Do not screenshot a checkout screen. This version does not have one.
 =====================================

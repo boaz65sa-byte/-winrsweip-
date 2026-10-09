@@ -15,6 +15,8 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { startSellerChat } from '../lib/contact';
+import { PAYMENTS_ENABLED } from '../lib/features';
 import { notifyUser } from '../lib/notifications';
 import { supabase } from '../lib/supabase';
 import { ThemeContext } from './_layout';
@@ -67,7 +69,7 @@ export default function ListingScreen() {
       if (b) setBids(b);
 
       if (l.seller_id) {
-        const { data: s } = await supabase.from('users').select('*').eq('id', l.seller_id).single();
+        const { data: s } = await supabase.from('seller_cards').select('*').eq('id', l.seller_id).maybeSingle();
         if (s) setSeller(s);
       }
     } catch (e) {
@@ -82,7 +84,7 @@ export default function ListingScreen() {
       Alert.alert('אוקציה הסתיימה', 'לא ניתן להגיש הצעות על אוקציה שנסגרה.');
       return;
     }
-    if (listing.ends_at && new Date(listing.ends_at) < new Date()) {
+    if (listing.ends_at && new Date(listing.ends_at) < new Date() && listing.status !== 'active') {
       Alert.alert('אוקציה הסתיימה', 'זמן האוקציה פג.');
       return;
     }
@@ -109,9 +111,6 @@ export default function ListingScreen() {
         .order('amount', { ascending: false })
         .limit(1)
         .single();
-
-      const safeTradeFee = Math.round(amount * 0.02);
-      const platformFee = Math.round(amount * 0.10);
 
       const { error: bidError } = await supabase.from('bids').insert({ listing_id: id, bidder_id: user.id, amount });
       if (bidError) throw new Error(bidError.message);
@@ -143,8 +142,18 @@ export default function ListingScreen() {
           match_amount: amount,
         }).eq('id', id);
         Alert.alert('🎯 Match!', `הצעתך של ₪${amount} עברה את מחיר הרזרבה!`);
-      } else {
+      } else if (PAYMENTS_ENABLED) {
+        const safeTradeFee = Math.round(amount * 0.02);
         Alert.alert('הצעה הוגשה! ✓', `הגשת ₪${amount} + ₪${safeTradeFee} Safe Trade Fee`);
+      } else {
+        Alert.alert(
+          'הצעה הוגשה! ✓',
+          `ההצעה של ₪${amount} נשמרה. אפשר לתאם עם המוכר בצ'אט.`,
+          [
+            { text: 'סגור', style: 'cancel' },
+            { text: 'פתח צ\'אט', onPress: () => startSellerChat(router, listing) },
+          ],
+        );
       }
 
       setShowBid(false);
@@ -157,16 +166,27 @@ export default function ListingScreen() {
   };
 
   const buyNow = () => {
+    if (!PAYMENTS_ENABLED) {
+      Alert.alert(
+        'יצירת קשר',
+        `לתאם עם המוכר לגבי "${listing.title}"?`,
+        [
+          { text: 'ביטול', style: 'cancel' },
+          { text: 'פתח צ\'אט', onPress: () => startSellerChat(router, listing) },
+        ],
+      );
+      return;
+    }
     Alert.alert(
       'קנה עכשיו',
       `לקנות את "${listing.title}" ב-₪${listing.buy_now_price}?`,
       [
         { text: 'ביטול', style: 'cancel' },
         {
-          text: `שלם ₪${listing.buy_now_price} ←`,
+          text: `המשך ₪${listing.buy_now_price} ←`,
           onPress: () => router.push({
             pathname: '/payment',
-            params: { listingId: listing.id, amount: listing.buy_now_price, title: listing.title },
+            params: { listingId: listing.id, amount: String(listing.buy_now_price), title: listing.title, sellerId: listing.seller_id ?? '' },
           }),
         },
       ]
@@ -293,10 +313,15 @@ export default function ListingScreen() {
                   <Text style={[s.sellerName, { color: theme.text }]}>{seller.full_name || 'משתמש'}</Text>
                   {seller.city && <Text style={[s.sellerCity, { color: theme.sub }]}>📍 {seller.city}</Text>}
                 </View>
-                {seller.verified && (
+                {seller.is_verified && (
                   <View style={s.verifiedBadge}>
                     <Text style={s.verifiedText}>✓ מאומת</Text>
                   </View>
+                )}
+                {!PAYMENTS_ENABLED && listing.seller_id && (
+                  <TouchableOpacity onPress={() => startSellerChat(router, listing)}>
+                    <Text style={{ color: '#FF4D1C', fontWeight: '800', fontSize: 13 }}>צ'אט</Text>
+                  </TouchableOpacity>
                 )}
               </View>
             </View>
@@ -334,7 +359,9 @@ export default function ListingScreen() {
         )}
         {listing.buy_now_price && (
           <TouchableOpacity style={s.buyBtn} onPress={buyNow}>
-            <Text style={s.buyBtnText}>קנה עכשיו ₪{listing.buy_now_price} ←</Text>
+            <Text style={s.buyBtnText}>
+              {PAYMENTS_ENABLED ? `קנה עכשיו ₪${listing.buy_now_price} ←` : 'צור קשר עם המוכר'}
+            </Text>
           </TouchableOpacity>
         )}
         {listing.listing_type === 'auction' && !listing.buy_now_price && (
@@ -362,9 +389,11 @@ export default function ListingScreen() {
                 autoFocus
               />
             </View>
-            <View style={s.feeBox}>
-              <Text style={s.feeText}>Safe Trade Fee (2%): +₪{safeTradeFee}</Text>
-            </View>
+            {PAYMENTS_ENABLED && (
+              <View style={s.feeBox}>
+                <Text style={s.feeText}>Safe Trade Fee (2%): +₪{safeTradeFee}</Text>
+              </View>
+            )}
             <View style={s.modalBtns}>
               <TouchableOpacity
                 style={[s.cancelBtn, { backgroundColor: theme.input, borderColor: theme.border }]}

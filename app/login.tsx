@@ -130,6 +130,9 @@ export default function LoginScreen() {
 
   const handleApple = async () => {
     try {
+      // Native iOS: Apple receives the SHA-256 hex nonce, Supabase receives the raw nonce.
+      // The identity token audience is the bundle ID, so the Apple provider Client IDs
+      // field must include com.winrswipe.app. No Services ID is required for this native flow.
       const { rawNonce, hashedNonce } = await createAppleNonce();
       const credential = await AppleAuthentication.signInAsync({
         requestedScopes: [

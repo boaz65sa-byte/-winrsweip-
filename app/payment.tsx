@@ -2,11 +2,54 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useContext, useState } from 'react';
 import { ActivityIndicator, Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { startSellerChat } from '../lib/contact';
+import { PAYMENTS_ENABLED } from '../lib/features';
 import { useStripe } from '../lib/stripe-provider';
 import { supabase } from '../lib/supabase';
 import { ThemeContext } from './_layout';
 
 export default function PaymentScreen() {
+  if (!PAYMENTS_ENABLED) return <PaymentsOff />;
+  return <PaymentCheckout />;
+}
+
+function PaymentsOff() {
+  const theme = useContext(ThemeContext);
+  const router = useRouter();
+  const params = useLocalSearchParams();
+
+  return (
+    <View style={[s.root, { backgroundColor: theme.bg }]}>
+      <StatusBar style={theme.dark ? 'light' : 'dark'} />
+      <View style={s.header}>
+        <TouchableOpacity onPress={() => router.back()}>
+          <Text style={[s.back, { color: theme.sub }]}>← חזור</Text>
+        </TouchableOpacity>
+        <Text style={[s.title, { color: theme.text }]}>תיאום</Text>
+      </View>
+      <View style={s.content}>
+        <View style={[s.card, { backgroundColor: theme.card, borderColor: theme.border }]}>
+          <Text style={[s.itemTitle, { color: theme.text }]}>{params.title || 'פריט'}</Text>
+          <Text style={[s.escrowText, { color: theme.sub }]}>
+            אפשר לתאם את המסירה עם המוכר בצ'אט.
+          </Text>
+        </View>
+        <TouchableOpacity
+          style={s.payBtn}
+          onPress={() => startSellerChat(router, {
+            id: params.listingId as string,
+            title: params.title as string,
+            seller_id: params.sellerId as string,
+          })}
+        >
+          <Text style={s.payBtnText}>פתח צ'אט עם המוכר</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+}
+
+function PaymentCheckout() {
   const theme = useContext(ThemeContext);
   const router = useRouter();
   const { initPaymentSheet, presentPaymentSheet } = useStripe();
@@ -43,7 +86,7 @@ export default function PaymentScreen() {
       if (typeof data.safeTradeFee === 'number') setSafeTradeFee(data.safeTradeFee);
 
       const { error: initError } = await initPaymentSheet({
-        merchantDisplayName: 'SwipeBid',
+        merchantDisplayName: 'WinrSwipe',
         paymentIntentClientSecret: data.clientSecret,
         defaultBillingDetails: { email: user.email },
         appearance: {
