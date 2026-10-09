@@ -37,11 +37,9 @@ App Review opens these URLs:
 - Support: https://winrsweip-boaz-s-projects-6bda35e8.vercel.app/support
 - Privacy: https://winrsweip-boaz-s-projects-6bda35e8.vercel.app/privacy
 
-The pages in `web/` match the free app (in-app deletion, no checkout). Production still serves the previous deploy until:
+The pages in `web/` match the free app (in-app deletion, no checkout). A push to `main` builds that Next.js app: the repo-root `vercel.json` runs `@vercel/next` on `web/package.json`. Both Vercel projects (`-winrsweip-` and `winrsweip`, team `boaz-s-projects-6bda35e8`) must keep Root Directory as the repository root so that file is used. If Root Directory is `web`, this root file is ignored and `web/vercel.json` (framework `nextjs`, no output directory) is the config instead.
 
-```bash
-cd web && npx vercel link --yes --project="-winrsweip-" && npx vercel --prod --yes
-```
+Do not publish production with a one-off `vercel --prod` from `web/` while Git is also connected. The next push to `main` replaces that alias.
 
 ## 4. EAS build (do not submit from here)
 
