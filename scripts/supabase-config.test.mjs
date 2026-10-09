@@ -47,6 +47,14 @@ test('free launch does not ship a Stripe publishable key', () => {
   assert.match(listing, /App Store Connect only/);
 });
 
+test('git deploys build the Next.js app in web/', () => {
+  const vercel = JSON.parse(readFileSync(join(root, 'vercel.json'), 'utf8'));
+  assert.deepEqual(vercel.builds, [{ src: 'web/package.json', use: '@vercel/next' }]);
+  const web = JSON.parse(readFileSync(join(root, 'web/vercel.json'), 'utf8'));
+  assert.equal(web.outputDirectory, undefined);
+  assert.equal(web.framework, 'nextjs');
+});
+
 test('reviewer password is not written in the repo', () => {
   const status = readFileSync(join(root, 'STATUS.md'), 'utf8');
   assert.match(status, /not stored in this repo/i);
