@@ -5,6 +5,20 @@ import type { NextRequest } from 'next/server';
 const ADMIN_EMAIL = 'boaz65sa@gmail.com';
 
 export async function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+  const isPublicPath =
+    pathname.startsWith('/login') ||
+    pathname.startsWith('/auth') ||
+    pathname.startsWith('/reset-password') ||
+    pathname.startsWith('/privacy') ||
+    pathname.startsWith('/terms') ||
+    pathname.startsWith('/support');
+
+  // Legal pages must answer even when Supabase env is missing.
+  if (isPublicPath) {
+    return NextResponse.next();
+  }
+
   let response = NextResponse.next({
     request: { headers: request.headers },
   });
@@ -28,14 +42,6 @@ export async function middleware(request: NextRequest) {
   );
 
   const { data: { user } } = await supabase.auth.getUser();
-
-  const isPublicPath =
-    request.nextUrl.pathname.startsWith('/login') ||
-    request.nextUrl.pathname.startsWith('/auth') ||
-    request.nextUrl.pathname.startsWith('/reset-password') ||
-    request.nextUrl.pathname.startsWith('/privacy') ||
-    request.nextUrl.pathname.startsWith('/terms') ||
-    request.nextUrl.pathname.startsWith('/support');
 
   if (!user && !isPublicPath) {
     return NextResponse.redirect(new URL('/login', request.url));
