@@ -5,6 +5,7 @@ import { ActivityIndicator, Alert, RefreshControl, ScrollView, StyleSheet, Text,
 import { PAYMENTS_ENABLED } from '../lib/features';
 import { supabase } from '../lib/supabase';
 import { ThemeContext } from './_layout';
+import { BsSimpleCredit } from '../components/BsSimpleCredit';
 
 export default function ProfileScreen() {
   const theme = useContext(ThemeContext);
@@ -328,6 +329,8 @@ export default function ProfileScreen() {
             ? <ActivityIndicator color="#FF4D1C" />
             : <Text style={s.deleteText}>מחק חשבון</Text>}
         </TouchableOpacity>
+
+        <BsSimpleCredit color={theme.sub} />
 
         <View style={{ height: 40 }} />
       </ScrollView>
