@@ -79,3 +79,4 @@ Attach the new build. Do not reuse build 24.
 2. Put a live publishable key in the EAS profile as `EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY`.
 3. Set Supabase secrets `PAYMENTS_ENABLED=true` and `STRIPE_SECRET_KEY` to the live secret.
 4. Ship a new build. Checkout, fees, and the paid terms section come back from that one flag.
+5. Since 1.0.1 the Stripe native SDK is not in the app. Reinstall it first: `npx expo install @stripe/stripe-react-native`, add its config plugin (`merchantIdentifier: merchant.com.winrswipe`) back to `app.json`, and restore the re-export in `lib/stripe-provider.ts`. This brings PassKit back into the iOS binary, so explain it in the App Review notes.

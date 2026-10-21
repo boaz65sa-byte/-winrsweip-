@@ -2,7 +2,7 @@
   "expo": {
     "name": "WinrSwipe",
     "slug": "swipebid-app2",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "winrswipe",
@@ -18,7 +18,9 @@
         "NSPrivacyAccessedAPITypes": [
           {
             "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategoryUserDefaults",
-            "NSPrivacyAccessedAPITypeReasons": ["CA92.1"]
+            "NSPrivacyAccessedAPITypeReasons": [
+              "CA92.1"
+            ]
           }
         ]
       },
@@ -70,13 +72,6 @@
           "dark": {
             "backgroundColor": "#0D0D0D"
           }
-        }
-      ],
-      [
-        "@stripe/stripe-react-native",
-        {
-          "merchantIdentifier": "merchant.com.winrswipe",
-          "enableGooglePay": false
         }
       ],
       [
