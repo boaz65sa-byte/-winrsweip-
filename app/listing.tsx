@@ -19,6 +19,7 @@ import { startSellerChat } from '../lib/contact';
 import { PAYMENTS_ENABLED } from '../lib/features';
 import { notifyUser } from '../lib/notifications';
 import { supabase } from '../lib/supabase';
+import { recordListingView } from '../lib/counters';
 import { ThemeContext } from './_layout';
 
 const { width } = Dimensions.get('window');
@@ -39,6 +40,7 @@ export default function ListingScreen() {
   const [bidLoading, setBidLoading] = useState(false);
 
   useEffect(() => { fetchAll(); }, [id]);
+  useEffect(() => { if (id) recordListingView(String(id)); }, [id]);
 
   useEffect(() => {
     if (!listing?.ends_at) return;
