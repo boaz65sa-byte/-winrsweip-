@@ -10,6 +10,7 @@ import { startSellerChat } from '../lib/contact';
 import { PAYMENTS_ENABLED } from '../lib/features';
 import { notifyUser } from '../lib/notifications';
 import { supabase } from '../lib/supabase';
+import { bidCountOf, fetchWatcherCounts, formatCounters } from '../lib/counters';
 import { ThemeContext } from './_layout';
 
 const { width } = Dimensions.get('window');
@@ -71,7 +72,7 @@ export default function App() {
     try {
       let q = supabase
         .from('listings')
-        .select('*')
+        .select('*, bids(count)')
         .eq('status', 'active')
         .order('created_at', { ascending: false });
 
@@ -86,7 +87,13 @@ export default function App() {
       setLoadError(null);
       const rows = data ?? [];
       if (rows.length > 0) setSawListings(true);
-      setProducts(rows.map(item => ({ ...item, emoji: '🛍️', bids: 0, watchers: 0 })));
+      const watchers = await fetchWatcherCounts(rows.map(r => r.id));
+      setProducts(rows.map(item => ({
+        ...item,
+        emoji: '🛍️',
+        bids: bidCountOf(item),
+        watchers: watchers ? watchers.get(item.id) ?? 0 : null,
+      })));
     } catch {
       setLoadError('לא הצלחנו לטעון מכרזים. נסה/י לרענן.');
       setProducts([]);
@@ -158,6 +165,7 @@ export default function App() {
 
       const { error: bidError } = await supabase.from('bids').insert({ listing_id: product.id, bidder_id: user.id, amount });
       if (bidError) throw new Error(bidError.message);
+      setProducts(prev => prev.map(p => (p.id === product.id ? { ...p, bids: (p.bids ?? 0) + 1 } : p)));
 
       // התראה לבידר הקודם — עקפו אותו
       if (prevBid?.bidder_id && prevBid.bidder_id !== user.id) {
@@ -331,9 +339,11 @@ export default function App() {
             <View style={[s.timerPill, { backgroundColor: theme.dark ? 'rgba(0,0,0,0.7)' : 'rgba(0,0,0,0.5)', borderColor: theme.border }]}>
               <Text style={s.timerText}>⏱ {timeLeft[product.id] || '00:00:00'}</Text>
             </View>
-            <View style={[s.watchersPill, { backgroundColor: theme.dark ? 'rgba(0,0,0,0.6)' : 'rgba(0,0,0,0.4)' }]}>
-              <Text style={s.watchersText}>👁 {product.watchers || 0}</Text>
+            {product.watchers != null && (
+              <View style={[s.watchersPill, { backgroundColor: theme.dark ? 'rgba(0,0,0,0.6)' : 'rgba(0,0,0,0.4)' }]}>
+              <Text style={s.watchersText}>👁 {product.watchers}</Text>
             </View>
+            )}
           </View>
           <View style={s.cardBody}>
             <Text style={[s.cardTitle, { color: theme.text }]}>{product.title}</Text>
@@ -351,7 +361,7 @@ export default function App() {
                 </TouchableOpacity>
               )}
             </View>
-            <Text style={[s.bidsCount, { color: theme.sub }]}>{product.bids || 0} הצעות · {product.watchers || 0} צופים</Text>
+            <Text style={[s.bidsCount, { color: theme.sub }]}>{formatCounters({ bids: product.bids ?? 0, watchers: product.watchers ?? null })}</Text>
           </View>
         </Animated.View>
       </GestureDetector>
