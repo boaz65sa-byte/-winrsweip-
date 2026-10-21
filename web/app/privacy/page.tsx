@@ -1,3 +1,4 @@
+import BsSimpleCredit from '../../components/BsSimpleCredit';
 const HE = [
   { title: '1. מבוא', body: 'WinrSwipe ("אנחנו", "השירות") מחויבת להגנת פרטיות המשתמשים. מדיניות זו מסבירה אילו מידע אנו אוספים, כיצד אנו משתמשים בו, ואיך ניתן לשלוט בו.' },
   { title: '2. מידע שאנו אוספים', body: 'א. מידע שאתה מספק:\n• שם מלא וכתובת אימייל\n• מספר טלפון — לא חובה\n• עיר, אם בחרת להוסיף\n• תמונות ווידאו של פריטים למכירה\n\nב. מידע שנאסף אוטומטית:\n• מיקום, רק אם ביקשת סינון לפי קרבה\n• נתוני שימוש: מסכים שביקרת, חיפושים, הצעות\n• מזהה מכשיר ו-Push Token להתראות' },
@@ -68,12 +69,9 @@ export default function PrivacyPage() {
           ))}
         </div>
 
-        <div style={{ color: '#333', fontSize: 11, textAlign: 'center', borderTop: '1px solid #1E1E1E', paddingTop: 20 }}>
-          bs-simple.com | בועז סעדה - פתרונות יצירתיים
-        </div>
+        <BsSimpleCredit />
       </div>
     </div>
   );
 }
 
-// bs-simple.com | בועז סעדה - פתרונות יצירתיים

@@ -1,3 +1,4 @@
+import BsSimpleCredit from '../../components/BsSimpleCredit';
 const HE = [
   {
     title: 'יצירת קשר',
@@ -67,12 +68,9 @@ export default function SupportPage() {
           ))}
         </div>
 
-        <div style={{ color: '#333', fontSize: 11, textAlign: 'center', borderTop: '1px solid #1E1E1E', paddingTop: 20 }}>
-          bs-simple.com | בועז סעדה - פתרונות יצירתיים
-        </div>
+        <BsSimpleCredit />
       </div>
     </div>
   );
 }
 
-// bs-simple.com | בועז סעדה - פתרונות יצירתיים
